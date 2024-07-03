@@ -1,4 +1,4 @@
-from ..Data import GlobalVars
+from ..Data import GlobalVars, IConfig
 from nonebot.log import logger
 from nonebot.adapters.discord import Bot as DiscordBot#, MessageSegment as DiscordMessageSegment, Message as DiscordMessage
 from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageCreateEvent
@@ -8,8 +8,9 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     if (not bool(GlobalVars.OneBotBotObj)):
         logger.debug("未找到OneBot");
         return
-    if (str(event.channel_id) != GlobalVars.DISCORD_CHANNEL_ID):
-        logger.debug(f"频道ID与设置不对等 [事件频道id: {str(event.channel_id)} | 设置频道id: {GlobalVars.DISCORD_CHANNEL_ID}]");
+
+    if (event.channel_id != IConfig.plugin_config.discord_channel):
+        logger.debug(f"频道ID与设置不对等 [事件频道id: {str(event.channel_id)} | 设置频道id: {IConfig.plugin_config.discord_channel}]");
         return
     
     # 此检测是为了防止转发机器人抽风
@@ -27,4 +28,4 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     #====================================================================================================
 
     message = f"[{event.member.nick} ({event.author.username})]:\n{event.content}"
-    await GlobalVars.OneBotBotObj.send_group_msg(group_id=int(GlobalVars.QQ_GROUP_ID), message=message)
+    await GlobalVars.OneBotBotObj.send_group_msg(group_id=int(IConfig.plugin_config.onebot_channel), message=message)

@@ -1,10 +1,12 @@
-from nonebot import get_driver
+from nonebot import get_driver, get_plugin_config
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 class Config(BaseModel):
-  discordChannel: str;
-  onebotChannel: str;
+  discord_channel: int;
+  onebot_channel: int;
 
-global_config = get_driver().config
-plugin_config = Config.parse_obj(global_config)
+  class Config:
+      extra = "ignore";
+
+plugin_config = get_plugin_config(Config)
