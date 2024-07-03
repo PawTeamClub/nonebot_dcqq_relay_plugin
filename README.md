@@ -1,0 +1,2 @@
+# nonebot_dcqq_relay_plugin
+使用Nonebot2让Discord和QQ实现互相通信
