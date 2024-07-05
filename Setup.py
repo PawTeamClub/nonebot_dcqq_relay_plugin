@@ -2,6 +2,7 @@ from .Data import GlobalVars, IConfig
 from nonebot import get_bots
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
+from pathlib import Path
 
 # 加载 OneBot 适配器
 # 由于nonebot_discord_adapter的特殊性，他要使用心跳包接受bot的信息才能正常使用，所以我使用了计时器来让discord bot正常获取
@@ -33,13 +34,18 @@ async def init():
     webhooks = await GlobalVars.DiscordBotObj.get_channel_webhooks(channel_id=int(IConfig.plugin_config.discord_channel));
     webhookTemp = next((w for w in webhooks if w.name == GlobalVars.BOT_NAME), None);
     if bool(webhookTemp): 
-        logger.debug("寻找到Webhook")
+        logger.debug("寻找到Webhook");
         GlobalVars.webhook = webhookTemp;
         GlobalVars.webhook_id = webhookTemp.id;
     else:
-        logger.debug("没有寻找到Webhook, 正在创建")
+        logger.debug("没有寻找到Webhook, 正在创建");
         GlobalVars.webhook = await GlobalVars.DiscordBotObj.create_webhook(channel_id=int(IConfig.plugin_config.discord_channel), name=GlobalVars.BOT_NAME);
         GlobalVars.webhook_id = GlobalVars.webhook.id;
+
+    path = Path() / "data" / "download";
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True);
+    GlobalVars.DOWNLOAD_PATH = path;
 
     # 关闭计时器
     scheduler.shutdown();
