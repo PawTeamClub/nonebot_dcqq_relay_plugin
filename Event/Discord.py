@@ -1,5 +1,6 @@
 from ..Utility import GlobalFuns
-from ..Data import GlobalVars, IConfig
+from ..Data import GlobalVars
+from ..Data.IConfig import plugin_config
 from ..Utility import Discord
 from nonebot.log import logger
 from nonebot.adapters.onebot.v11 import Bot as OneBotBot, GroupMessageEvent as OneBotGroupMessageEvent, MessageSegment as OneBotMessageSegment, GroupUploadNoticeEvent as OneBotGroupUploadNoticeEvent
@@ -54,7 +55,7 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
     # 确保事件类型是群文件上传
     if not isinstance(event, OneBotGroupUploadNoticeEvent):
         return;
-    if event.group_id != IConfig.plugin_config.onebot_channel:
+    if event.group_id != plugin_config.onebot_channel:
         return
     # 防止机器人自己转发自己的消息
     login_info = await bot.get_login_info()
@@ -84,7 +85,7 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
         stateCode = f"，HTTP 状态码：{FileStateCode}"
         errorMessage = f"用户 {user_name} 上传了文件：\n"
         errorMessage += f"但是下载文件失败，请联系管理员重新下载文件{stateCode}"
-        await GlobalVars.DiscordBotObj.send_to(channel_id=int(IConfig.plugin_config.discord_channel), message=errorMessage)
+        await GlobalVars.DiscordBotObj.send_to(channel_id=int(plugin_config.discord_channel), message=errorMessage)
         return;
 
     file = File(

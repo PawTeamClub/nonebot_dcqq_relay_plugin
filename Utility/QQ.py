@@ -1,4 +1,5 @@
-from ..Data import GlobalVars, IConfig
+from ..Data import GlobalVars
+from ..Data.IConfig import plugin_config;
 from . import GlobalFuns
 from typing import Optional
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage
@@ -24,7 +25,7 @@ class QQ():
     # 发送文字
     async def sendGroup(self, Message: str | OneBotMessage):
         message = f"[{self.get_name()}]:\n{Message}";
-        await GlobalVars.OneBotBotObj.send_group_msg(group_id=int(IConfig.plugin_config.onebot_channel), message=message);
+        await GlobalVars.OneBotBotObj.send_group_msg(group_id=int(plugin_config.onebot_channel), message=message);
     
     # 发送图片
     async def sendImage(self, imageURL: str):
@@ -53,7 +54,7 @@ class QQ():
         await self.sendGroup(f"Upload file ({fileInfo.filename})");
 
         # 上传文件
-        await GlobalVars.OneBotBotObj.upload_group_file(group_id=int(IConfig.plugin_config.onebot_channel), file=str(file_path.resolve()), name=fileInfo.filename);
+        await GlobalVars.OneBotBotObj.upload_group_file(group_id=int(plugin_config.onebot_channel), file=str(file_path.resolve()), name=fileInfo.filename);
 
 
 

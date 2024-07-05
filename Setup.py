@@ -1,4 +1,5 @@
-from .Data import GlobalVars, IConfig
+from .Data import GlobalVars
+from .Data.IConfig import plugin_config;
 from nonebot import get_bots
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
@@ -31,7 +32,7 @@ async def init():
     
     # 通过频道id查询webhook列表
     # 如果没有创建那就创建，如果有那就直接用
-    webhooks = await GlobalVars.DiscordBotObj.get_channel_webhooks(channel_id=int(IConfig.plugin_config.discord_channel));
+    webhooks = await GlobalVars.DiscordBotObj.get_channel_webhooks(channel_id=int(plugin_config.discord_channel));
     webhookTemp = next((w for w in webhooks if w.name == GlobalVars.BOT_NAME), None);
     if bool(webhookTemp): 
         logger.debug("寻找到Webhook");
@@ -39,7 +40,7 @@ async def init():
         GlobalVars.webhook_id = webhookTemp.id;
     else:
         logger.debug("没有寻找到Webhook, 正在创建");
-        GlobalVars.webhook = await GlobalVars.DiscordBotObj.create_webhook(channel_id=int(IConfig.plugin_config.discord_channel), name=GlobalVars.BOT_NAME);
+        GlobalVars.webhook = await GlobalVars.DiscordBotObj.create_webhook(channel_id=int(plugin_config.discord_channel), name=GlobalVars.BOT_NAME);
         GlobalVars.webhook_id = GlobalVars.webhook.id;
 
     path = Path() / "data" / "download";
