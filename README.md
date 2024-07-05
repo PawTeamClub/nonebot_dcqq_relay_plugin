@@ -24,6 +24,8 @@ _✨ 使用Nonebot2让Discord和QQ实现互相通信 ✨_
 
 你需要安装以下python库: `aiohttp | pathlib`
 
+目前的测试平台是 `Nonebot2 + Lagrange.Onebot`
+
 # 配置
 
 ## DISCORD_CHANNEL
