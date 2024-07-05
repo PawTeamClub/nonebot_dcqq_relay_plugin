@@ -10,7 +10,7 @@ from nonebot.adapters.discord.api import File
 async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     if (not bool(GlobalVars.DiscordBotObj)):
         return;
-    if event.group_id != IConfig.plugin_config.onebot_channel:
+    if event.group_id != plugin_config.onebot_channel:
         return;
     
     # 防止机器人自己转发自己的消息
