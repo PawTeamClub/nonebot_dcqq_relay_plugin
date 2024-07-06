@@ -32,22 +32,28 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     avatar_url = f"http://q.qlogo.cn/headimg_dl?dst_uin={user_id}&spec=640";
 
     #====================================================================================================
-    #[CQ:at,qq=114514]
+
+    # [CQ:at,qq=114514]
+    # 默认表情ID表: https://bot.q.qq.com/wiki/develop/api/openapi/emoji/model.html
+    #
+
     # 预防特殊事件导致脚本发生错误
     for segment in event.message:
-        if segment.type == "image":
+        if segment.type == "image" or segment.type == "mface":
             await Discord.sendMeg(user_name, avatar_url, segment.data['url'])
         # Debug Mode
         elif segment.type != "text":
             # 这是一个 CQ 码
             cq_type = segment.type;
             cq_data = segment.data;
-            print(f"检测到 CQ 码：\n类型: {cq_type}\n数据: {cq_data}")
+            logger.debug(f"检测到 CQ 码：\n类型: {cq_type}\n数据: {cq_data}")
         elif not bool(segment.data.get('text')):
             logger.warning(f"遇到无法处理的文本, 进行跳过处理 [内容: {repr(segment.data)}]");
             return;
         else:
-            await Discord.sendMeg(user_name, avatar_url, str(segment))
+            cleaned_text = Discord.remove_encoded_faces(str(segment))
+            if cleaned_text.strip():  # 只有在清理后的文本不为空时才发送
+                await Discord.sendMeg(user_name, avatar_url, cleaned_text)
 
 
 @GlobalVars.noticeEvent.handle()

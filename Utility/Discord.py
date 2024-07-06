@@ -1,5 +1,13 @@
+import re
 from ..Data import GlobalVars
 from nonebot.adapters.discord.api import File
+
+# 用于匹配编码的表情文本的正则表达式
+ENCODED_FACE_PATTERN = re.compile(r'&#91;([^&#]+)&#93;')
+
+# 移除编码的表情文本
+def remove_encoded_faces(text: str) -> str:
+    return ENCODED_FACE_PATTERN.sub('', text)
 
 # Discord -> 发送纯文本消息
 async def sendMeg(username: str, avatar_url:str, message: str):
