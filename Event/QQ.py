@@ -1,4 +1,4 @@
-from ..Utility.QQ import QQ
+from ..Utility.QQ import QQ, formatImg
 from ..Data import GlobalVars
 from ..Data.IConfig import plugin_config
 from nonebot.log import logger
@@ -41,10 +41,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
             # 下载文件
             await QQFunc.sendFile(fileInfo);
 
-    
     if len(event.content) <= 0:
         return;
 
-    await QQFunc.sendGroup(event.content);
-        
-
+    await QQFunc.sendGroup(formatImg(event.content));

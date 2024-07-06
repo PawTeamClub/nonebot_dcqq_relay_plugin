@@ -1,10 +1,52 @@
+import re
 from ..Data import GlobalVars
 from ..Data.IConfig import plugin_config;
 from . import GlobalFuns
 from typing import Optional
-from nonebot.adapters.onebot.v11 import Message as OneBotMessage
+from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
 from nonebot.adapters.discord.api import Attachment as DiscordAttachment
 from nonebot.log import logger
+
+# Emoji正则表达
+EMOJI_PATTERN = re.compile(r'<:(\w+):(\d+)>')
+
+def formatImg(content: str):
+    # 如果文本空的就返回空文本
+    if not content:
+        return "";
+
+    # 如果没有符合正则表达式的直接返回文本
+    emojis = EMOJI_PATTERN.findall(content)
+    if not emojis:
+        return content;
+
+    # 局部变量
+    segments = []
+    last_end = 0
+
+    # 遍历
+    for emoji_name, emoji_id in emojis:
+        # 找到表情在原文中的位置
+        start = content.index(f'<:{emoji_name}:{emoji_id}>', last_end)
+        
+        # 添加表情前的文本
+        if start > last_end:
+            segments.append(OneBotMessageSegment.text(content[last_end:start]))
+
+        # 获取表情的 URL
+        emoji_url = f'https://cdn.discordapp.com/emojis/{emoji_id}.png'
+
+        # 添加转换后的表情（使用 CQ 码）
+        segments.append(OneBotMessageSegment.image(emoji_url))
+
+        last_end = start + len(f'<:{emoji_name}:{emoji_id}>')
+
+    # 添加最后一个表情后的文本
+    if last_end < len(content):
+        segments.append(OneBotMessageSegment.text(content[last_end:]))
+
+    # 包装成OneBot消息后返回
+    return OneBotMessage(segments);
 
 class QQ():
 
@@ -51,7 +93,7 @@ class QQ():
             f.write(FileBytes);
         
         # 当上传文件时提示是谁发送的内容
-        await self.sendGroup(f"Upload file ({fileInfo.filename})");
+        await self.sendGroup(f"上传了文件 ({fileInfo.filename})");
 
         # 上传文件
         await GlobalVars.OneBotBotObj.upload_group_file(group_id=int(plugin_config.onebot_channel), file=str(file_path.resolve()), name=fileInfo.filename);
