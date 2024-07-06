@@ -1,7 +1,7 @@
 from ..Utility import GlobalFuns
 from ..Data import GlobalVars
 from ..Data.IConfig import plugin_config
-from ..Utility import Discord
+from ..Utility.Discord import Discord, remove_encoded_faces
 from nonebot.log import logger
 from nonebot.adapters.onebot.v11 import Bot as OneBotBot, GroupMessageEvent as OneBotGroupMessageEvent, MessageSegment as OneBotMessageSegment, GroupUploadNoticeEvent as OneBotGroupUploadNoticeEvent
 from nonebot.adapters.discord.api import File
@@ -30,13 +30,14 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     user_info = await bot.get_group_member_info(group_id=event.group_id, user_id=user_id, no_cache=True);     # 事件的用户信息带有缓存，以防更新不及时先这样挂着
     user_name = f"{user_info['card'] or user_info['nickname']} (QQ: {user_id})";
     avatar_url = f"http://q.qlogo.cn/headimg_dl?dst_uin={user_id}&spec=640";
+    DiscordFunc = Discord(user_name, avatar_url)
 
     #====================================================================================================
 
     # 预防特殊事件导致脚本发生错误
     for segment in event.message:
         if segment.type == "image" or segment.type == "mface":        # 图片和自定义表情
-            await Discord.sendMeg(user_name, avatar_url, segment.data['url'])
+            await DiscordFunc.sendMeg(segment.data['url'])
         elif segment.type == "face":                                  # 表情
             # 自己收集的表情
             # https://github.com/Robonyantame/QQEmojiFiles
@@ -44,7 +45,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
             # 防止没有表情然后发送链接
             Filebyte, FileStatusCode = await GlobalFuns.getFile(emojiURL)
             if FileStatusCode == 200:
-                await Discord.sendMeg(user_name, avatar_url, emojiURL)
+                await DiscordFunc.sendMeg(emojiURL)
         # Debug Mode
         elif segment.type != "text":
             # 这是一个 CQ 码
@@ -56,9 +57,9 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
             return;
         else:
             # 都怪mface
-            cleaned_text = Discord.remove_encoded_faces(str(segment))
+            cleaned_text = remove_encoded_faces(str(segment))
             if cleaned_text.strip():  # 只有在清理后的文本不为空时才发送
-                await Discord.sendMeg(user_name, avatar_url, cleaned_text)
+                await DiscordFunc.sendMeg(user_name, avatar_url, cleaned_text)
 
 
 @GlobalVars.noticeEvent.handle()
@@ -87,7 +88,8 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
 
     user_name = f"{user_info['card'] or user_info['nickname']} (QQ: {user_id})";
     avatar_url = f"http://q.qlogo.cn/headimg_dl?dst_uin={user_id}&spec=640";
-
+    DiscordFunc = Discord(user_name, avatar_url)
+    
     #====================================================================================================
 
     FileBytes, FileStateCode = await GlobalFuns.getFile(file_url)
@@ -96,7 +98,7 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
         stateCode = f"，HTTP 状态码：{FileStateCode}"
         errorMessage = f"用户 {user_name} 上传了文件：\n"
         errorMessage += f"但是下载文件失败，请联系管理员重新下载文件{stateCode}"
-        await GlobalVars.DiscordBotObj.send_to(channel_id=int(plugin_config.discord_channel), message=errorMessage)
+        await DiscordFunc.send(errorMessage)
         return;
 
     # File类格式化
@@ -105,4 +107,4 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
         content=FileBytes
     )
 
-    await Discord.sendFile(user_name, avatar_url, file);
+    await DiscordFunc.sendFile(user_name, avatar_url, file);
