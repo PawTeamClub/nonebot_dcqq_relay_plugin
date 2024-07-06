@@ -97,8 +97,3 @@ class QQ():
 
         # 上传文件
         await GlobalVars.OneBotBotObj.upload_group_file(group_id=int(plugin_config.onebot_channel), file=str(file_path.resolve()), name=fileInfo.filename);
-
-
-
-
-

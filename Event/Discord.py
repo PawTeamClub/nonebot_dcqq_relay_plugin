@@ -33,10 +33,6 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
 
     #====================================================================================================
 
-    # [CQ:at,qq=114514]
-    # 默认表情ID表: https://bot.q.qq.com/wiki/develop/api/openapi/emoji/model.html
-    #
-
     # 预防特殊事件导致脚本发生错误
     for segment in event.message:
         if segment.type == "image" or segment.type == "mface":
