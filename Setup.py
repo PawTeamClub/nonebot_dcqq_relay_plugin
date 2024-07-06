@@ -6,7 +6,8 @@ from .Data.IConfig import plugin_config;
 from nonebot.adapters.discord import Bot as DiscordBot
 from nonebot.adapters.onebot.v11 import Bot as OneBotBot
 
-# 以下大部分代码是对着此项目改的: https://github.com/Autuamn/nonebot-plugin-dcqg-relay/blob/main/nonebot_plugin_dcqg_relay/__init__.py
+# 以下大部分代码是对着此项目复制的: https://github.com/Autuamn/nonebot-plugin-dcqg-relay/blob/main/nonebot_plugin_dcqg_relay/__init__.py
+# 谢谢大神！
 driver = get_driver()
 
 path = Path() / "data" / "download";
@@ -15,15 +16,15 @@ if not path.exists():
 GlobalVars.DOWNLOAD_PATH = path;
 
 @driver.on_bot_connect
-async def get_dc_bot(bot: DiscordBot):
+async def getDiscordBot(bot: DiscordBot):
     GlobalVars.DiscordBotObj = bot
 
 @driver.on_bot_connect
-async def get_qq_bot(bot: OneBotBot):
+async def getQQBot(bot: OneBotBot):
      GlobalVars.OneBotBotObj = bot
 
 @driver.on_bot_connect
-async def prepare_webhooks(bot: DiscordBot):
+async def getWebhook(bot: DiscordBot):
     if not bot:
         return;
 

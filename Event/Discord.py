@@ -21,7 +21,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     #====================================================================================================
 
     # Webhook格式
-    # 用户名：Robonyan_tame (QQ: 2723106391):
+    # 用户名：Robonyan_tame (QQ: 123456789):
     # 文本：Hi!
 
     #====================================================================================================
@@ -99,6 +99,7 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
         await GlobalVars.DiscordBotObj.send_to(channel_id=int(plugin_config.discord_channel), message=errorMessage)
         return;
 
+    # File类格式化
     file = File(
         filename=file_name, 
         content=FileBytes
