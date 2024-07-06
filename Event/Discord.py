@@ -35,8 +35,16 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
 
     # 预防特殊事件导致脚本发生错误
     for segment in event.message:
-        if segment.type == "image" or segment.type == "mface":
+        if segment.type == "image" or segment.type == "mface":        # 图片和自定义表情
             await Discord.sendMeg(user_name, avatar_url, segment.data['url'])
+        elif segment.type == "face":                                  # 表情
+            # 自己收集的表情
+            # https://github.com/Robonyantame/QQEmojiFiles
+            emojiURL = f"https://robonyantame.github.io/QQEmojiFiles/Image/{segment.data.get('id')}.gif"
+            # 防止没有表情然后发送链接
+            Filebyte, FileStatusCode = await GlobalFuns.getFile(emojiURL)
+            if FileStatusCode == 200:
+                await Discord.sendMeg(user_name, avatar_url, emojiURL)
         # Debug Mode
         elif segment.type != "text":
             # 这是一个 CQ 码
@@ -47,6 +55,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
             logger.warning(f"遇到无法处理的文本, 进行跳过处理 [内容: {repr(segment.data)}]");
             return;
         else:
+            # 都怪mface
             cleaned_text = Discord.remove_encoded_faces(str(segment))
             if cleaned_text.strip():  # 只有在清理后的文本不为空时才发送
                 await Discord.sendMeg(user_name, avatar_url, cleaned_text)
