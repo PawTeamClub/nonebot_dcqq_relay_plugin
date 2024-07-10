@@ -8,7 +8,7 @@
 
 <br />
 
-_✨ 使用Nonebot2让Discord和QQ实现互相通信 ✨_
+_✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 <br />
 
