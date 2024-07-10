@@ -52,6 +52,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
         print(result.get("message_id"))
         await DiscordModule.Update(str(event.id), result.get("message_id"))
 
+#@todo: delete_msg有异常，怀疑是Lagrange.Onebot的问题
 @noticeEvent.handle()
 async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDeleteEvent):
     if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageDeleteEvent) or event.channel_id != plugin_config.discord_channel:
