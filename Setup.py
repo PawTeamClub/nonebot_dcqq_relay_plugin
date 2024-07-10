@@ -1,40 +1,28 @@
-from pathlib import Path
-from .Data import GlobalVars
-from nonebot import get_driver
-from nonebot.log import logger
-from .Data.IConfig import plugin_config;
-from nonebot.adapters.discord import Bot as DiscordBot
-from nonebot.adapters.onebot.v11 import Bot as OneBotBot
+import setuptools
 
-# 以下大部分代码是对着此项目复制的: https://github.com/Autuamn/nonebot-plugin-dcqg-relay/blob/main/nonebot_plugin_dcqg_relay/__init__.py
-# 谢谢大神！
-driver = get_driver()
+long_description = None;
+requirements = None;
 
-path = Path() / "data" / "download";
-if not path.exists():
-    path.mkdir(parents=True, exist_ok=True);
-GlobalVars.DOWNLOAD_PATH = path;
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
-@driver.on_bot_connect
-async def getDiscordBot(bot: DiscordBot):
-    GlobalVars.DiscordBotObj = bot
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
-@driver.on_bot_connect
-async def getQQBot(bot: OneBotBot):
-     GlobalVars.OneBotBotObj = bot
-
-@driver.on_bot_connect
-async def getWebhook(bot: DiscordBot):
-    if not bot:
-        return;
-
-    webhooks = await bot.get_channel_webhooks(channel_id=int(plugin_config.discord_channel));
-    webhookTemp = next((w for w in webhooks if w.name == GlobalVars.BOT_NAME), None);
-    if bool(webhookTemp): 
-        logger.debug("寻找到Webhook");
-        GlobalVars.webhook = webhookTemp;
-        GlobalVars.webhook_id = webhookTemp.id;
-    else:
-        logger.debug("没有寻找到Webhook, 正在创建");
-        GlobalVars.webhook = await bot.create_webhook(channel_id=int(plugin_config.discord_channel), name=GlobalVars.BOT_NAME);
-        GlobalVars.webhook_id = GlobalVars.webhook.id;
+setuptools.setup(
+    name="nonebot_dcqq_relay_plugin",
+    version="0.1.0",
+    author="Robonyantame",
+    author_email="robonyantame@gmail.com",
+    description="使用Nonebot2让Discord和QQ群实现互相通信",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin",
+    packages=setuptools.find_packages(),
+    python_requires=">=3.8, <4.0",
+    classifiers=[
+            'License :: OSI Approved :: MIT License',
+            'Programming Language :: Python :: 3',
+    ],
+    install_requires=requirements,
+)

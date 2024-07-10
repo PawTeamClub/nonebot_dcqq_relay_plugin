@@ -1,6 +1,6 @@
-from nonebot import get_driver, get_plugin_config
+from nonebot import get_plugin_config
 from typing import List, Optional
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 class Config(BaseModel):
   discord_channel: int;
