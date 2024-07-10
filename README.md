@@ -50,6 +50,9 @@ ONEBOT_CHANNEL="123456789"
 
 # TODO:
 
-1. 撤回功能 # onebot的delete_smg函数不知道为什么总是给我撤回到奇奇怪怪的随机消息ID上，怀疑是Lagrange.Onebot的问题
+1. 撤回功能
+    - Discord撤回onebot消息异常
+        - onebot的delete_smg函数不知道为什么总是给我撤回到奇奇怪怪的随机消息ID上，怀疑是Lagrange.Onebot的问题
+    - onebot撤回Discord消息没有问题 (未仔细检查)
 2. at处理
 3. 回复处理
