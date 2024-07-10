@@ -20,11 +20,9 @@ _✨ 使用Nonebot2让Discord和QQ实现互相通信 ✨_
 
 目前此库还在开发阶段，所以不是很能用
 
-~~被骂就被骂吧无所谓了~~
+我不会打包成pip程序给nonebot2导入，第一次用setuptools，先暂时这样吧()
 
-我不会打包成pip程序给nonebot2导入，先暂时这样吧()
-
-你需要安装以下python库: `aiohttp | pathlib`
+需要安装的库请查看requirements.txt
 
 目前的测试平台是 `Nonebot2 + Lagrange.Onebot`
 
@@ -52,7 +50,6 @@ ONEBOT_CHANNEL="123456789"
 
 # TODO:
 
-1. 撤回功能
-2. 整理代码
-3. at处理
-4. 回复处理
+1. 撤回功能 # onebot的delete_smg函数不知道为什么总是给我撤回到奇奇怪怪的随机消息ID上，怀疑是Lagrange.Onebot的问题
+2. at处理
+3. 回复处理
