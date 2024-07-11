@@ -24,7 +24,7 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 需要安装的库请查看requirements.txt
 
-~~目前的测试平台是 `Nonebot2 + Lagrange.Onebot`~~ 见#TODO
+~~目前的测试平台是 `Nonebot2 + Lagrange.Onebot`~~ 见[#TODO第一栏](#todo)
 
 目前的测试平台是 `Nonebot2 + NapCatQQ`
 
