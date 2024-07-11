@@ -39,7 +39,7 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 [如果你不知道怎么开启开发者模式，点我](https://beebom.com/how-enable-disable-developer-mode-discord/#:~:text=Turn%20on%20Discord%20Developer%20Mode%20%28Android%2C%20iOS%29%201,access%20the%20IDs%20of%20channels%20and%20messages.%20)
 
 ```json
-DISCORD_CHANNEL="123456789"
+DISCORD_CHANNEL="1234567890000000000000"
 ```
 
 ## ONEBOT_CHANNEL
@@ -48,6 +48,35 @@ DISCORD_CHANNEL="123456789"
 
 ```json
 ONEBOT_CHANNEL="123456789"
+```
+
+## env配置例子
+
+```
+# nonebot2默认配置
+DRIVER=~fastapi+~httpx+~websockets
+
+# nonebot_dcqq_relay_plugin配置
+DISCORD_CHANNEL="1234567890000000000000"
+ONEBOT_CHANNEL="123456789"
+
+# nonebot2 discord适配器设置
+DISCORD_PROXY='http://127.0.0.1:8080'
+DISCORD_BOTS='
+[
+  {
+    "token": "xxxxx",
+    "intent": {
+      "guild_messages": true,
+      "guild_message_reactions": true,
+      "direct_messages": true,
+      "direct_message_reactions": true,
+      "message_content": true
+    },
+    "application_commands": {"*": ["*"]}
+  }
+]
+'
 ```
 
 # TODO:
