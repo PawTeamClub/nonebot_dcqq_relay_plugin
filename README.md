@@ -24,7 +24,9 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 需要安装的库请查看requirements.txt
 
-目前的测试平台是 `Nonebot2 + Lagrange.Onebot`
+~~目前的测试平台是 `Nonebot2 + Lagrange.Onebot`~~ 见#TODO
+
+目前的测试平台是 `Nonebot2 + NapCatQQ`
 
 # 配置
 
@@ -51,9 +53,10 @@ ONEBOT_CHANNEL="123456789"
 # TODO:
 
 1. 撤回功能
-    - Discord撤回onebot消息异常
-        - Lagrange.Onebot的bug: onebot的delete_smg函数不知道为什么总是给我撤回到奇奇怪怪的随机消息ID上
-        - 使用LLOneBot测试时没有问题
+    - Discord撤回onebot消息异常 (因为这是Lagrange.Onebot的bug, 暂时先记着)
+        - 问题: delete_smg函数总是撤回消息的id和接收消息的id不一样  (在[Lagrange.Core/issues#226](https://github.com/LagrangeDev/Lagrange.Core/issues/226#issuecomment-2009693106)的回答中也遇到了这个问题，暂时没有解决方案 ~~我也不会C#~~)
+        - 为什么不给Lagrange团队丢issue: 虽然这是Core的问题，但因为问题冲突了所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
+        - 使用LLOneBot、NapCatQQ框架测试时没有问题
     - onebot撤回Discord消息没有问题 (未仔细检查)
 2. at处理
 3. 回复处理
