@@ -25,9 +25,9 @@ setuptools.setup(
         "nonebot2>=2.3.1",
         "nonebot-adapter-onebot>=2.4.3",
         "nonebot-adapter-discord>=0.1.8",
-        "httpx>=0.27.0",
-        "fastapi>=0.111.0",
-        "websockets>=12.0",
+        "nonebot2[fastapi]>=2.3.1",
+        "nonebot2[httpx]>=2.3.1",
+        "nonebot2[websockets]>=2.3.1",
         "tortoise-orm>=0.21.4"
     ],
 )
