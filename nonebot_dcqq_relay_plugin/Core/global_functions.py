@@ -1,4 +1,4 @@
-import aiohttp, shutil
+import aiohttp, shutil, httpx, random, string
 from typing import Union, Tuple, Optional
 from pathlib import Path
 from nonebot.log import logger
@@ -17,6 +17,13 @@ def getPathFolder(path: Union[str, Path]) -> Path:
     if not main_path.exists():
         main_path.mkdir(parents=True, exist_ok=True);
     return main_path
+
+def generate_random_string(min: int = 6, max: int = 20) -> str:
+    """随机生成一个最小和最大的字符串"""
+    length = random.randint(min, max)  # 随机生成长度在6到20之间
+    characters = string.ascii_letters + string.digits  # 包含大小写字母和数字
+    random_string = ''.join(random.choice(characters) for _ in range(length))
+    return random_string
 
 def cleanDownloadFolder(path: Path):
     """
@@ -42,13 +49,6 @@ def cleanDownloadFolder(path: Path):
 async def getFile(weblink: str) -> Tuple[Optional[bytes], int]:
     """
     异步获取指定URL的文件内容。
-
-    Args:
-        weblink (str): 要获取的文件的URL。
-
-    Returns:
-        Tuple[Optional[bytes], int]: 包含文件内容（如果成功）和HTTP状态码的元组。
-        如果发生错误，返回 (None, 状态码)。
     """
     try:
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
@@ -64,3 +64,25 @@ async def getFile(weblink: str) -> Tuple[Optional[bytes], int]:
     except Exception as e:
         logger.error(f"Unexpected error when fetching file: {e}", exc_info=True)
         return None, 0
+    
+async def getHttpxFile(weblink: str) -> Tuple[Optional[bytes], int, Optional[str]]:
+    """
+    异步获取指定URL的文件内容，并确定文件类型。
+    原因: https://github.com/LagrangeDev/Lagrange.Core/issues/315
+    """
+    try:
+        async with httpx.AsyncClient(verify=False) as client:
+            response = await client.get(weblink)
+            if response.status_code == 200:
+                data = response.content
+                content_type = response.headers.get('Content-Type', None)
+                return data, response.status_code, str(content_type)
+            else:
+                logger.warning(f"Failed to fetch file. Status: {response.status_code}, URL: {weblink}")
+                return None, response.status_code, None
+    except httpx.HTTPError as e:
+        logger.error(f"Client error when fetching file: {e}", exc_info=True)
+        return None, 0, None
+    except Exception as e:
+        logger.error(f"Unexpected error when fetching file: {e}", exc_info=True)
+        return None, 0, None

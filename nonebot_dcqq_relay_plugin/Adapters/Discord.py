@@ -1,6 +1,7 @@
 import re
+from nonebot.log import logger
 from typing import List, Optional
-from Core.global_functions import getFile
+from Core.global_functions import getFile, getHttpxFile, generate_random_string
 from config import plugin_config
 from nonebot.adapters.discord.api import File, MessageGet, MessageReference
 from Core.constants import bot_manager, ENCODED_FACE_PATTERN
@@ -88,7 +89,26 @@ class Discord:
     async def sendFace(self, segment: OneBotMessageSegment) -> Optional[MessageGet]:
         """Discord -> 解析QQ表情后发送"""
         if segment.type in ["image", "mface"]:
-            return await self.sendMessage(segment.data['url'])
+
+            # 有待优化
+            file_byte, file_status_code, file_type = await getHttpxFile(segment.data['url'])
+            if file_status_code == 200 and "image" in file_type:
+                imgtype = ""
+
+                # 不知道这些类型够不够用
+                if "gif" in file_type:
+                    imgtype = ".gif"
+                elif "jpeg" in file_type:
+                    imgtype = ".jpg"
+                elif "png" in file_type:
+                    imgtype = ".png"
+                else:
+                    logger.error(f"Unknown Image Type [Type: {file_type}]")
+                    return None;
+
+                file = File(filename=generate_random_string() + imgtype, content=file_byte)
+                return await self.sendFile(file)
+            
         elif segment.type == "face":
             emojiURL = f"https://robonyantame.github.io/QQEmojiFiles/Image/{segment.data.get('id')}.gif"
             file_byte, file_status_code = await getFile(emojiURL)
