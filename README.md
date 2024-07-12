@@ -98,7 +98,8 @@ A3: 技术力不够~~因为懒~~
 1. 撤回功能
     - Discord撤回onebot消息异常 (因为这是Lagrange.Onebot的bug, 暂时先记着)
         - 问题: delete_smg函数总是撤回消息的id和接收消息的id不一样  (在[Lagrange.Core/issues#226](https://github.com/LagrangeDev/Lagrange.Core/issues/226#issuecomment-2009693106)的回答中也遇到了这个问题，暂时没有解决方案 ~~我也不会C#~~)
-        - 为什么不给Lagrange团队丢issue: 虽然这是Core的问题，但因为问题冲突了所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
+        - 为什么不给Lagrange团队丢issue: 虽然issue那边是Core的问题，但因为问题冲突了所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
+        - 在部分群是负值，但是在我自己的debug群确是正值就很奇怪
         - 使用LLOneBot、NapCatQQ框架测试时没有问题
     - onebot撤回Discord消息没有问题 (未仔细检查)
 2. at处理 (Discord单方面对QQ用户进行at处理, QQ懒得做了)
