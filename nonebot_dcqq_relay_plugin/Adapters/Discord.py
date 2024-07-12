@@ -2,7 +2,7 @@ import re
 from typing import List, Optional
 from Core.global_functions import getFile
 from config import plugin_config
-from nonebot.adapters.discord.api import File, MessageGet
+from nonebot.adapters.discord.api import File, MessageGet, MessageReference
 from Core.constants import bot_manager, ENCODED_FACE_PATTERN
 from nonebot.adapters.onebot.v11 import (
     Bot as OneBotBot,
@@ -21,6 +21,15 @@ def remove_encoded_faces(text: str) -> str:
     '''移除编码的表情文本'''
     return ENCODED_FACE_PATTERN.sub('', text)
 
+
+# 解析回复cq码
+def extract_reply_cq(message_str):
+    reply_pattern = r'\[CQ:reply,id=(-?\d+).*?\]'
+    match = re.search(reply_pattern, message_str)
+    if match:
+        return match.group(1)  # 返回回复的消息 ID
+    return None
+
 #=================================================
 
 class Discord:
@@ -29,9 +38,20 @@ class Discord:
         self.avatar_url = avatar_url;
 
     @staticmethod
-    async def send(message: str) -> None:
+    async def send(message: str) -> MessageGet:
         """Discord -> 发送纯文本(非webhook)"""
-        await bot_manager.DiscordBotObj.send_to(channel_id=int(plugin_config.discord_channel), message=message)
+        return await bot_manager.DiscordBotObj.send_to(channel_id=int(plugin_config.discord_channel), message=message)
+
+    async def reply(self, message_id: int) -> MessageGet:
+        """Discord -> 提醒用户被回复了"""
+        return await bot_manager.DiscordBotObj.create_message(
+            channel_id=int(plugin_config.discord_channel), 
+            message_reference=MessageReference(
+                message_id=message_id,
+                channel_id=int(plugin_config.discord_channel)
+            ), 
+            content=f"{self.username} replied to this message!" 
+        )
 
     async def _execute_webhook(self, **kwargs) -> MessageGet:
         """执行webhook的通用方法"""

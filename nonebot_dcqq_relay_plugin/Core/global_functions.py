@@ -19,6 +19,9 @@ def getPathFolder(path: Union[str, Path]) -> Path:
     return main_path
 
 def cleanDownloadFolder(path: Path):
+    """
+    清理下载文件夹以保证不会给缓存文件暂满
+    """
     # 确保下载路径存在
     if not path.exists():
         logger.warning(f"Download folder does not exist: {str(path.resolve())}")

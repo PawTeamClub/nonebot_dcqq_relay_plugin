@@ -16,17 +16,17 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 # 注意
 
-此项目是基于onebot v11与discord适配器进行使用
+此项目是基于onebot v11与discord适配器进行使用，理论支持所有onebot v11项目
 
-目前此库还在开发阶段，所以不是很能用
+目前此插件还在开发阶段，所以不是很能用
 
-我不会打包成pip程序给nonebot2导入，第一次用setuptools，先暂时这样吧()
+如果你在本插件开发的过程中使用，请做好每次更新都要删除数据库的打算 (
+
+我不会打包成pip程序给nonebot2导入，等做完基础的再研究
 
 需要安装的库请查看requirements.txt
 
-~~目前的测试平台是 `Nonebot2 + Lagrange.Onebot`~~ 见[#TODO第一栏](#todo)
-
-目前的测试平台是 `Nonebot2 + NapCatQQ`
+目前的测试平台是 `Nonebot2 + Lagrange.Onebot || NapCatQQ`
 
 # 配置
 
@@ -79,6 +79,20 @@ DISCORD_BOTS='
 '
 ```
 
+# Q & A
+
+Q1: 遇到"unable to verify the first certificate"报错 (通常是因为使用了类似于steamcommunity 302反代工具和NapCatQQ框架的下载文件强制使用可信证书导致)
+
+A1: 1. 强制修改源码 2. 使用代理工具全局代理，不要使用反代工具
+
+Q2: 撤回无法使用
+
+A2: 看[TODO第一条](#todo)
+
+Q3: 为何不做多QQ群多频道转发
+
+A3: 技术力不够~~因为懒~~
+
 # TODO:
 
 1. 撤回功能
@@ -87,5 +101,4 @@ DISCORD_BOTS='
         - 为什么不给Lagrange团队丢issue: 虽然这是Core的问题，但因为问题冲突了所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
         - 使用LLOneBot、NapCatQQ框架测试时没有问题
     - onebot撤回Discord消息没有问题 (未仔细检查)
-2. at处理
-3. 回复处理
+2. at处理 (Discord单方面对QQ用户进行at处理, QQ懒得做了)
