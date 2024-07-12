@@ -21,13 +21,15 @@ def remove_encoded_faces(text: str) -> str:
     '''移除编码的表情文本'''
     return ENCODED_FACE_PATTERN.sub('', text)
 
+# 解析cq码
+def extract_cq(message_type, message_str):
+    pattern = r'\[CQ:(\w+),id=(-?\d+).*?\]'
+    matches = re.findall(pattern, message_str)
 
-# 解析回复cq码
-def extract_reply_cq(message_str):
-    reply_pattern = r'\[CQ:reply,id=(-?\d+).*?\]'
-    match = re.search(reply_pattern, message_str)
-    if match:
-        return match.group(1)  # 返回回复的消息 ID
+    for match in matches:
+        cq_type, cq_id = match
+        if cq_type == message_type:
+            return cq_id
     return None
 
 #=================================================

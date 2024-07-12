@@ -2,7 +2,7 @@ from nonebot.log import logger
 from config import plugin_config
 from Core.global_functions import getFile
 from nonebot.adapters.discord.api import File, MessageGet
-from Adapters.Discord import Discord, get_user_info, extract_reply_cq
+from Adapters.Discord import Discord, get_user_info, extract_cq
 from Core.constants import messageEvent, bot_manager, noticeEvent
 from Database import DB, QQModule
 from nonebot.adapters.onebot.v11 import (
@@ -39,7 +39,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     #====================================================================================================
 
     # 回复
-    reply_id = extract_reply_cq(event.raw_message)
+    reply_id = extract_cq("reply", event.raw_message)
     if reply_id:
         onebotReplyMessageID = await DB.find_by_onebot_message_id(reply_id);
         if onebotReplyMessageID:
@@ -48,6 +48,9 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
         else:
             res = await DiscordFunc.reply(reply_id);
             await QQModule.Update(str(event.message_id), res.id, "content")
+
+    # 回复
+    # None
 
     # 遍历信息获取常见CQ码
     for segment in event.message:
