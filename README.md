@@ -102,5 +102,5 @@ A3: 技术力不够~~因为懒~~
         - 在部分群是负值，但是在我自己的debug群确是正值就很奇怪
         - 使用LLOneBot、NapCatQQ框架测试时没有问题
     - onebot撤回Discord消息没有问题 (未仔细检查)
-
+2. 同区域(discord回复discord、QQ回复QQ)好像没反应，明天检查
 ~~做几把@，做不了一点~~
