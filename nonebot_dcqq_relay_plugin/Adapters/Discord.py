@@ -106,6 +106,7 @@ class Discord:
                     logger.error(f"Unknown Image Type [Type: {file_type}]")
                     return None;
 
+                # 在想是传字节码好还是文件好
                 file = File(filename=generate_random_string() + imgtype, content=file_byte)
                 return await self.sendFile(file)
             
