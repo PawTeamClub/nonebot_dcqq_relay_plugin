@@ -6,9 +6,6 @@ requirements = None;
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
-
 setuptools.setup(
     name="nonebot_dcqq_relay_plugin",
     version="0.1.0",
@@ -24,5 +21,13 @@ setuptools.setup(
             'License :: OSI Approved :: MIT License',
             'Programming Language :: Python :: 3',
     ],
-    install_requires=requirements,
+    install_requires=[
+        "nonebot2>=2.3.1",
+        "nonebot-adapter-onebot>=2.4.3",
+        "nonebot-adapter-discord>=0.1.8",
+        "httpx>=0.27.0",
+        "fastapi>=0.111.0",
+        "websockets>=12.0",
+        "tortoise-orm>=0.21.4"
+    ],
 )
