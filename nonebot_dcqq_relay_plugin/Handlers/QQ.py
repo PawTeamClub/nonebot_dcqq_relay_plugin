@@ -80,6 +80,16 @@ async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDe
     if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageDeleteEvent) or event.channel_id != plugin_config.discord_channel:
         return;
 
+    # Discord撤回QQ用户消息
+    discordMessage = await DB.find_by_discord_message_id(str(event.id))
+    try:
+        if discordMessage:
+            await bot_manager.OneBotObj.delete_msg(message_id=int(discordMessage.onebot_message_id));
+            return;
+    except Exception as e:
+        pass;
+    
+    # Discord用户自主撤回
     messageList = await DiscordModule.GetIDs(str(event.id))
     if not messageList or len(messageList) <= 0:
         return;
