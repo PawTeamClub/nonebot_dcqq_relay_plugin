@@ -121,40 +121,22 @@ async def handle_group_recall(bot: OneBotBot, event: OneBotGroupRecallNoticeEven
 
     # 撤回discord用户消息
     onebotMessageID = await DB.find_by_onebot_message_id(event.message_id);
-    try:
-        if onebotMessageID:
-            findDiscordMessage = bot_manager.DiscordBotObj.get_channel_message(
-                channel_id=int(plugin_config.discord_channel),
-                message_id=onebotMessageID.discord_message_id
-            )
-            if findDiscordMessage:
-                await bot_manager.DiscordBotObj.delete_message(
-                    channel_id=int(plugin_config.discord_channel),
-                    message_id=onebotMessageID.discord_message_id
-                )
-                return
-    except Exception as e:
-        pass;
+    if onebotMessageID:
+        try:
+            Discord.deleteMessage(onebotMessageID.discord_message_id);
+            return;
+        except Exception as e:
+            pass;
 
     # QQ用户自主撤回
-    messageList = await QQModule.GetIDs(event.message_id)
+    messageList = await QQModule.GetTables(event.message_id)
     if not messageList or len(messageList) <= 0:
         return;
     
     for segment in messageList:
-
-        findDiscordMessage = bot_manager.DiscordBotObj.get_webhook_message(
-            webhook_id=bot_manager.webhook_id,
-            token=bot_manager.webhook.token,
-            message_id=segment
-        )
-
-        if not findDiscordMessage:
+        if segment["type"] != "reply":
+            Discord.deleteWebhookMessage(segment["id"]);
             continue;
+        Discord.deleteMessage(segment["id"]);
         
-        await bot_manager.DiscordBotObj.delete_webhook_message(
-            webhook_id=bot_manager.webhook_id,
-            token=bot_manager.webhook.token,
-            message_id=segment
-        )
     

@@ -36,6 +36,46 @@ def extract_cq(message_type, message_str):
 #=================================================
 
 class Discord:
+
+    @classmethod
+    async def deleteMessage(cls, MessageID: int):
+        if not MessageID:
+            return;
+        
+        findDiscordMessage = bot_manager.DiscordBotObj.get_channel_message(
+            channel_id=int(plugin_config.discord_channel),
+            message_id=MessageID
+        );
+
+        if not findDiscordMessage:
+            return;
+        
+        await bot_manager.DiscordBotObj.delete_message(
+            channel_id=int(plugin_config.discord_channel),
+            message_id=MessageID
+        )
+
+    @classmethod
+    async def deleteWebhookMessage(MessageID: int):
+
+        if not MessageID:
+            return;
+        
+        findDiscordMessage = bot_manager.DiscordBotObj.get_webhook_message(
+            webhook_id=bot_manager.webhook_id,
+            token=bot_manager.webhook.token,
+            message_id=MessageID
+        )
+
+        if not findDiscordMessage:
+            return;
+        
+        await bot_manager.DiscordBotObj.delete_webhook_message(
+            webhook_id=bot_manager.webhook_id,
+            token=bot_manager.webhook.token,
+            message_id=MessageID
+        )
+        
     def __init__(self, username: str, avatar_url:str):
         self.username = username;
         self.avatar_url = avatar_url;
