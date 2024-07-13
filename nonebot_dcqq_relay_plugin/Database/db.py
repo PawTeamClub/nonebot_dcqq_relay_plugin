@@ -1,4 +1,5 @@
 import json
+from nonebot.log import logger
 from typing import List, Any, Optional
 from pathlib import Path
 from tortoise import Tortoise
@@ -119,8 +120,7 @@ class DB():
         if index:
             return await MessageMapping.get(id=index.message_mapping_id)
 
-        # 如果索引表中没有，则查找主表
-        return await MessageMapping.filter(onebot_message_id=onebot_message_id).first()
+        return None;
     
     @staticmethod
     async def find_by_onebot_message_ids(onebot_message_id: str, page: int = 1, page_size: int = 100):
@@ -142,11 +142,11 @@ class DB():
     async def find_by_discord_message_id(discord_message_id: str):
         # 首先查找索引表
         index = await DiscordMessageIndex.filter(discord_message_id=discord_message_id).first()
+        
         if index:
             return await MessageMapping.get(id=index.message_mapping_id)
 
-        # 如果索引表中没有，则查找主表
-        return await MessageMapping.filter(discord_message_id=discord_message_id).first()
+        return None;
     
     @staticmethod
     async def find_by_discord_message_ids(discord_message_id: str, page: int = 1, page_size: int = 100):
