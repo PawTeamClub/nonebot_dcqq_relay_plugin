@@ -100,7 +100,7 @@ class DB():
             "apps": {
                 "nonebot_dcqq_relay": {
                     #"models": ["nonebot_dcqq_relay_plugin.Database.models"],
-                    "models": ["Database.models"],
+                    "models": ["nonebot_dcqq_relay_plugin.Database.models"],
                     "default_connection": "nonebot_dcqq_relay_db",
                 }
             },
