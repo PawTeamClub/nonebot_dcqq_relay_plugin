@@ -24,6 +24,22 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 [如果你嫌这个项目不够好用，可以尝试Autuamn大大的nonebot-plugin-dcqq-relay插件](https://github.com/Autuamn/nonebot-plugin-dcqq-relay)
 
+# 功能
+
+**ARK消息和Embed消息暂不打算支持**
+
+### 目前支持的消息：
+- [x] 文字
+- [x] 图片
+- [x] 表情
+- [x] 回复消息
+- [x] 文件 
+- [x] 撤回消息 ([如果你使用的是Lagrange.Onebot那么可能会失效](#已知BUG列表))
+
+### 尚未支持的消息：
+- [ ] 语音
+- [ ] 视频
+
 # 安装
 
 目前此插件还在早期开发阶段，还有许多问题，如果遇到问题还请务必提 [issue](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/issues)。
@@ -136,7 +152,7 @@ A3: 技术力不够~~因为懒~~
 
 1. Discord撤回onebot消息异常 (Lagrange.Onebot|Lagrange.Core的bug)
      - 问题: delete_smg函数总是撤回消息的id和接收消息的id不一样 (在[Lagrange.Core/issues#226](https://github.com/LagrangeDev/Lagrange.Core/issues/226#issuecomment-2009693106)的回答中也遇到了这个问题，暂时没有解决方案 ~~我也不会C#~~)
-     - 为什么不给Lagrange团队丢issue: 虽然issue那边是Core的问题，但因为问题冲突了所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
+     - 为什么不给Lagrange团队丢issue: 虽然issue那边是Core的问题，但因为是相同问题所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
      - 使用LLOneBot、NapCatQQ框架测试时没有问题
 2. 同区域(discord回复discord、QQ回复QQ)好像没反应，明天检查
 3. 当一个人发了多图多文或者是多个表情的时候，可能会因为网络问题导致发送变慢
