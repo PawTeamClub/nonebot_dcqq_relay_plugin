@@ -162,8 +162,7 @@ A3: 技术力不够~~因为懒~~
      - 问题: delete_smg函数总是撤回消息的id和接收消息的id不一样 (在[Lagrange.Core/issues#226](https://github.com/LagrangeDev/Lagrange.Core/issues/226#issuecomment-2009693106)的回答中也遇到了这个问题，暂时没有解决方案 ~~我也不会C#~~)
      - 为什么不给Lagrange团队丢issue: 虽然issue那边是Core的问题，但因为是相同问题所以我就不发了 ~~根本原因还是害怕挨骂和害怕交流~~
      - 使用LLOneBot、NapCatQQ框架测试时没有问题
-2. 同区域(discord回复discord、QQ回复QQ)好像没反应，明天检查
-3. 当一个人发了多图多文或者是多个表情的时候，可能会因为网络问题导致发送变慢
+2. 当一个人发了多图多文或者是多个表情的时候，可能会因为网络问题导致发送变慢
 
 # TODO:
 ~~做几把@，做不了一点~~
