@@ -67,6 +67,8 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 打开 nonebot2 项目的 `bot.py` 文件, 在其中写入
 
+如果你没有`bot.py`文件，请使用`nb-cli`生成bot文件
+
     nonebot.load_plugin('nonebot_dcqq_relay_plugin')
 
 </details>
