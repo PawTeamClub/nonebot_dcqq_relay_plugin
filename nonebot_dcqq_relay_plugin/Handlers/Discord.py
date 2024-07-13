@@ -113,17 +113,20 @@ async def handle_group_recall(bot: OneBotBot, event: OneBotGroupRecallNoticeEven
 
     # 撤回discord用户消息
     onebotMessageID = await DB.find_by_onebot_message_id(event.message_id);
-    if onebotMessageID:
-        findDiscordMessage = bot_manager.DiscordBotObj.get_channel_message(
-            channel_id=int(plugin_config.discord_channel),
-            message_id=onebotMessageID.discord_message_id
-        )
-        if findDiscordMessage:
-            await bot_manager.DiscordBotObj.delete_message(
+    try:
+        if onebotMessageID:
+            findDiscordMessage = bot_manager.DiscordBotObj.get_channel_message(
                 channel_id=int(plugin_config.discord_channel),
                 message_id=onebotMessageID.discord_message_id
             )
-            return
+            if findDiscordMessage:
+                await bot_manager.DiscordBotObj.delete_message(
+                    channel_id=int(plugin_config.discord_channel),
+                    message_id=onebotMessageID.discord_message_id
+                )
+                return
+    except Exception as e:
+        pass;
 
     # QQ用户自主撤回
     messageList = await QQModule.GetIDs(event.message_id)
