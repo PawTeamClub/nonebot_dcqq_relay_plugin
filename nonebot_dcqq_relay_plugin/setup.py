@@ -49,7 +49,8 @@ async def getWebhook(bot: DiscordBot):
         return;
 
     webhooks = await bot.get_channel_webhooks(channel_id=int(plugin_config.discord_channel));
-    webhookTemp = next((w for w in webhooks if w.name == BOT_NAME), None);
+    webhookTemp = next((w for w in webhooks if w.name == BOT_NAME and w.user.username == bot.self_info.username), None);
+    
     if bool(webhookTemp): 
         logger.debug("寻找到Webhook");
         bot_manager.webhook = webhookTemp;

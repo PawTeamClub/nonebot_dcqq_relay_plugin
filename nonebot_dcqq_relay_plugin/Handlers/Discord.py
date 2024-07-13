@@ -48,10 +48,14 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
         onebotReplyMessageID = await DB.find_by_onebot_message_id(reply_id);
         if onebotReplyMessageID:
             res = await DiscordFunc.reply(onebotReplyMessageID.discord_message_id);
-            await QQModule.Update(str(event.message_id), res.id, "content")
+            await QQModule.Update(str(event.message_id), res.id, "relay")
         else:
-            res = await DiscordFunc.reply(reply_id);
-            await QQModule.Update(str(event.message_id), res.id, "content")
+            QQDB = await QQModule.GetTables(reply_id)
+            if QQDB is not None:
+                segment = QQDB[-1]['id']
+                logger.info(f"reply_id: {segment}")
+                res = await DiscordFunc.reply(int(segment));
+                await QQModule.Update(str(event.message_id), str(res.id), "relay")
 
     # 回复
     # None
