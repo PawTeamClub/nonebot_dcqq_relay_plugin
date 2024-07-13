@@ -48,14 +48,14 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
         onebotReplyMessageID = await DB.find_by_onebot_message_id(reply_id);
         if onebotReplyMessageID:
             res = await DiscordFunc.reply(onebotReplyMessageID.discord_message_id);
-            await QQModule.Update(str(event.message_id), res.id, "relay")
+            await QQModule.Update(str(event.message_id), res.id, "reply")
         else:
             QQDB = await QQModule.GetTables(reply_id)
             if QQDB is not None:
                 segment = QQDB[-1]['id']
                 logger.info(f"reply_id: {segment}")
                 res = await DiscordFunc.reply(int(segment));
-                await QQModule.Update(str(event.message_id), str(res.id), "relay")
+                await QQModule.Update(str(event.message_id), str(res.id), "reply")
 
     # 回复
     # None
@@ -68,7 +68,8 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
             continue;
         elif segment.type in ["image", "mface", "face"]:                            # 表情
             res = await DiscordFunc.sendFace(segment)
-            await QQModule.Update(str(event.message_id), res.id, "image")
+            if res is not None:
+                await QQModule.Update(str(event.message_id), res.id, "image")
         elif segment.type != "text":                                                # 孩子也不知道有啥要做的
             logger.debug(f"检测到 CQ 码：\n类型: {segment.type}\n数据: {segment.data}")
         else:                                                                       # 统统转文字处理
@@ -123,7 +124,7 @@ async def handle_group_recall(bot: OneBotBot, event: OneBotGroupRecallNoticeEven
     onebotMessageID = await DB.find_by_onebot_message_id(event.message_id);
     if onebotMessageID:
         try:
-            Discord.deleteMessage(onebotMessageID.discord_message_id);
+            await Discord.deleteMessage(onebotMessageID.discord_message_id);
             return;
         except Exception as e:
             pass;
@@ -135,8 +136,8 @@ async def handle_group_recall(bot: OneBotBot, event: OneBotGroupRecallNoticeEven
     
     for segment in messageList:
         if segment["type"] != "reply":
-            Discord.deleteWebhookMessage(segment["id"]);
+            await Discord.deleteWebhookMessage(segment["id"]);
             continue;
-        Discord.deleteMessage(segment["id"]);
+        await Discord.deleteMessage(segment["id"]);
         
     

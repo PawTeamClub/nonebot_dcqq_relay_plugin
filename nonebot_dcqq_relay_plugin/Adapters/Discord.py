@@ -42,7 +42,7 @@ class Discord:
         if not MessageID:
             return;
         
-        findDiscordMessage = bot_manager.DiscordBotObj.get_channel_message(
+        findDiscordMessage = await bot_manager.DiscordBotObj.get_channel_message(
             channel_id=int(plugin_config.discord_channel),
             message_id=MessageID
         );
@@ -56,12 +56,12 @@ class Discord:
         )
 
     @classmethod
-    async def deleteWebhookMessage(MessageID: int):
+    async def deleteWebhookMessage(cls, MessageID: int):
 
         if not MessageID:
             return;
         
-        findDiscordMessage = bot_manager.DiscordBotObj.get_webhook_message(
+        findDiscordMessage = await bot_manager.DiscordBotObj.get_webhook_message(
             webhook_id=bot_manager.webhook_id,
             token=bot_manager.webhook.token,
             message_id=MessageID
@@ -75,7 +75,7 @@ class Discord:
             token=bot_manager.webhook.token,
             message_id=MessageID
         )
-        
+
     def __init__(self, username: str, avatar_url:str):
         self.username = username;
         self.avatar_url = avatar_url;
@@ -128,7 +128,7 @@ class Discord:
 
     async def sendFace(self, segment: OneBotMessageSegment) -> Optional[MessageGet]:
         """Discord -> 解析QQ表情后发送"""
-        if segment.type in ["image", "mface"]:
+        if segment.type == "image":
 
             # 有待优化
             file_byte, file_status_code, file_type = await getHttpxFile(segment.data['url'])
@@ -149,7 +149,8 @@ class Discord:
                 # 在想是传字节码好还是文件好
                 file = File(filename=generate_random_string() + imgtype, content=file_byte)
                 return await self.sendFile(file)
-            
+        elif segment.type == "mface":
+            return await self.sendMessage(segment.data['url'])
         elif segment.type == "face":
             emojiURL = f"https://robonyantame.github.io/QQEmojiFiles/Image/{segment.data.get('id')}.gif"
             file_byte, file_status_code = await getFile(emojiURL)
