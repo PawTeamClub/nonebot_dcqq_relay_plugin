@@ -110,10 +110,17 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
 async def handle_group_recall(bot: OneBotBot, event: OneBotGroupRecallNoticeEvent):
     if not bot_manager.DiscordBotObj or not isinstance(event, OneBotGroupRecallNoticeEvent) or event.group_id != plugin_config.onebot_channel:
         return;
-    login_info = await bot.get_login_info()
-    if event.user_id == login_info["user_id"]:
-        return;
 
+    # 撤回discord消息
+    onebotReplyMessageID = await DB.find_by_onebot_message_id(event.message_id);
+    if onebotReplyMessageID:
+        await bot_manager.DiscordBotObj.delete_message(
+            channel_id=int(plugin_config.discord_channel),
+            message_id=onebotReplyMessageID.discord_message_id
+        )
+        return
+
+    # QQ方面自行撤回
     messageList = await QQModule.GetIDs(event.message_id)
     if not messageList or len(messageList) <= 0:
         return;

@@ -27,7 +27,6 @@ class DiscordModule():
     async def Update(cls, discord_message_id: str, onebot_message_id: str, onebot_message_type: str):
         """往Discord表添加QQ信息"""
         mapping = await MessageMapping.get(discord_message_id=discord_message_id)
-        #mapping.onebot_message_ids.append(onebot_message_id)
         mapping.onebot_message_ids.append({"id": onebot_message_id, "type": onebot_message_type})
         await mapping.save()
     @classmethod
@@ -64,10 +63,16 @@ class QQModule():
         mapping.discord_message_ids.append({"id": discord_message_id, "type": discord_message_type})
         await mapping.save()
     @classmethod
-    async def GetIDs(cls, onebot_message_id: str) -> List[Any]:
+    async def GetTables(cls, onebot_message_id: str) -> List[Any]:
         """在QQ消息表获取Discord消息ID列表"""
         mapping = await MessageMapping.get_or_none(onebot_message_id=onebot_message_id)
         return mapping.discord_message_ids if mapping else []
+    @classmethod
+    async def GetIDs(cls, onebot_message_id: str) -> List[Any]:
+        """获取QQ消息表的QQ消息ID"""
+        mapping = await cls.GetTables(onebot_message_id);
+        logger.debug(f"mapping len: {len(mapping)}")
+        return [item['id'] for item in mapping] if mapping else []
     @classmethod
     async def GetID(cls, onebot_message_id: str, element: Any) -> Optional[Any]:
         """获取与给定元素匹配的单个Discord消息ID"""
