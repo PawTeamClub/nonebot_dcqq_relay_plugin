@@ -105,6 +105,14 @@ DISCORD_CHANNEL="1234567890000000000000"
 ONEBOT_CHANNEL="123456789"
 ```
 
+## DATA_DIR (未测试)
+
+修改数据文件默认存储路径，默认存在包安装目录下
+
+```json
+DATA_DIR="./data/"
+```
+
 ## env配置例子
 
 ```

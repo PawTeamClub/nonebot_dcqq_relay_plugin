@@ -15,7 +15,9 @@ driver = get_driver()
 @driver.on_startup
 async def init():
     # 创建路径
-    MainPath = getPathFolder("./data/");
+    pathStr = plugin_config.data_dir + "/data/" if plugin_config.data_dir is not None else "./data/";
+    logger.debug(f"Plugin Data Path: {pathStr}");
+    MainPath = getPathFolder(pathStr);
     bot_manager.DOWNLOAD_PATH = getPathFolder(MainPath / "download");
     bot_manager.DATABASE_PATH = getPathFolder(MainPath / "db");
     # 初始化数据库

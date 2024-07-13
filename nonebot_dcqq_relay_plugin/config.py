@@ -3,6 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class Config(BaseModel):
+  data_dir: Optional[str] = None
   discord_channel: int;
   onebot_channel: int;
 
