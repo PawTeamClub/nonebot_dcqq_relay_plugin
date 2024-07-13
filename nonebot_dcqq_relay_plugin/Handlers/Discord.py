@@ -1,10 +1,12 @@
 from nonebot.log import logger
-from config import plugin_config
-from Core.global_functions import getFile
+
+from nonebot_dcqq_relay_plugin.config import plugin_config
+from nonebot_dcqq_relay_plugin.Database import DB, QQModule
+from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, noticeEvent
+from nonebot_dcqq_relay_plugin.Adapters.Discord import Discord, get_user_info, extract_cq
+from nonebot_dcqq_relay_plugin.Core.global_functions import getFile
+
 from nonebot.adapters.discord.api import File, MessageGet
-from Adapters.Discord import Discord, get_user_info, extract_cq
-from Core.constants import messageEvent, bot_manager, noticeEvent
-from Database import DB, QQModule
 from nonebot.adapters.onebot.v11 import (
     Bot as OneBotBot,
     GroupMessageEvent as OneBotGroupMessageEvent,
@@ -12,6 +14,8 @@ from nonebot.adapters.onebot.v11 import (
     GroupRecallNoticeEvent as OneBotGroupRecallNoticeEvent,
     GroupUploadNoticeEvent as OneBotGroupUploadNoticeEvent
 )
+
+#====================================================================================================
 
 # 消息事件
 @messageEvent.handle()

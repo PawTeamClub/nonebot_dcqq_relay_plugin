@@ -1,11 +1,12 @@
-import re, os
-from Core.constants import bot_manager, EMOJI_PATTERN
-from Core.global_functions import getFile
-from config import plugin_config;
 from typing import Any, List, Optional, Union
+from nonebot.log import logger
+from nonebot_dcqq_relay_plugin.config import plugin_config;
+from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, EMOJI_PATTERN
+from nonebot_dcqq_relay_plugin.Core.global_functions import getFile
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
 from nonebot.adapters.discord.api import Attachment as DiscordAttachment
-from nonebot.log import logger
+
+#=================================================
 
 # Emoji正则表达
 def formatImg(content: str):

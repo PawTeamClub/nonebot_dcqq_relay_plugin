@@ -1,12 +1,16 @@
 #from pathlib import Path
-from Core.constants import bot_manager, BOT_NAME
-from Core.global_functions import cleanDownloadFolder, getPathFolder
-from Database import DB
 from nonebot import get_driver
 from nonebot.log import logger
-from config import plugin_config;
+
 from nonebot.adapters.discord import Bot as DiscordBot
 from nonebot.adapters.onebot.v11 import Bot as OneBotBot
+
+from nonebot_dcqq_relay_plugin.config import plugin_config;
+from nonebot_dcqq_relay_plugin.Database import DB
+from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, BOT_NAME
+from nonebot_dcqq_relay_plugin.Core.global_functions import cleanDownloadFolder, getPathFolder
+
+#====================================================================================================
 
 # 以下大部分代码是对着此项目复制的: https://github.com/Autuamn/nonebot-plugin-dcqg-relay/blob/main/nonebot_plugin_dcqg_relay/__init__.py
 # 谢谢大神！

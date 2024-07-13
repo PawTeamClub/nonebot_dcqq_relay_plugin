@@ -1,10 +1,10 @@
 import re
-from nonebot.log import logger
 from typing import List, Optional
-from Core.global_functions import getFile, getHttpxFile, generate_random_string
-from config import plugin_config
+from nonebot.log import logger
+from nonebot_dcqq_relay_plugin.config import plugin_config
+from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, ENCODED_FACE_PATTERN
+from nonebot_dcqq_relay_plugin.Core.global_functions import getFile, getHttpxFile, generate_random_string
 from nonebot.adapters.discord.api import File, MessageGet, MessageReference
-from Core.constants import bot_manager, ENCODED_FACE_PATTERN
 from nonebot.adapters.onebot.v11 import (
     Bot as OneBotBot,
     MessageSegment as OneBotMessageSegment

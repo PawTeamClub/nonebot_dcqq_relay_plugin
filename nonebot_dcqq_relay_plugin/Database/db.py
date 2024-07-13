@@ -1,16 +1,13 @@
 import json
-from nonebot.log import logger
 from typing import List, Any, Optional
+from .models import MessageMapping, OnebotMessageIndex, DiscordMessageIndex
 from pathlib import Path
 from tortoise import Tortoise
-from .models import MessageMapping, OnebotMessageIndex, DiscordMessageIndex
+from nonebot.log import logger
 from tortoise.connection import connections
 from tortoise.expressions import RawSQL
 
 #====================================================================
-
-def getRelay():
-    pass
 
 # Discord数据库
 

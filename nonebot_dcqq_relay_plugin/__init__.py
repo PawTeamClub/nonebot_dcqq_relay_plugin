@@ -32,15 +32,6 @@
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 from nonebot.plugin import PluginMetadata
-from nonebot import get_driver
-import sys,os
-
-#===============================================
-environment = get_driver().config.environment
-if environment == "dev":
-    project_root = os.path.dirname(os.path.abspath(__file__))
-    print("root path: ", project_root)
-    sys.path.insert(0, project_root)
     
 #===============================================
     

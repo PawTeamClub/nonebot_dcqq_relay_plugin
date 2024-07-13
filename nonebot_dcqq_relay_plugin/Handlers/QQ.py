@@ -1,13 +1,14 @@
 
-import asyncio
-from Database.db import DB, DiscordModule
 from nonebot.log import logger
-from config import plugin_config
-from Adapters.QQ import QQ, formatImg
-from Core.constants import messageEvent, bot_manager, noticeEvent
+
+from nonebot_dcqq_relay_plugin.config import plugin_config
+from nonebot_dcqq_relay_plugin.Adapters.QQ import QQ, formatImg
+from nonebot_dcqq_relay_plugin.Database.db import DB, DiscordModule
+from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, noticeEvent
+
 from nonebot.adapters.discord import Bot as DiscordBot#, MessageSegment as DiscordMessageSegment, Message as DiscordMessage
-from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageCreateEvent, MessageDeleteEvent as DiscordMessageDeleteEvent
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
+from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageCreateEvent, MessageDeleteEvent as DiscordMessageDeleteEvent
 
 #====================================================================================================
 
