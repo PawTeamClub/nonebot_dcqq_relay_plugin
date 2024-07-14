@@ -50,13 +50,19 @@ def formatImg(content: str):
 class QQ():
     
     # 构造函数
-    def __init__(self, userName: str, userNick: Optional[str] = None):
+    def __init__(self, userName: str, globalName: Optional[str], userNick: Optional[str] = None):
         self.userName = userName;
+        self.global_name = globalName;
         self.userNick = userNick;
 
     # 获取名称
     def getName(self) -> str:
-        return f"{self.userNick} ({self.userName})" if self.userNick else self.userName;
+        if self.userNick:
+            return f"{self.userNick} ({self.userName})"
+        elif self.global_name:
+            return f"{self.global_name} ({self.userName})"
+        else:
+            return self.userName;
 
     # 发送文字
     async def sendGroup(self, Message: Union[str, OneBotMessage]) -> dict[str, Any]:

@@ -12,6 +12,15 @@ from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageC
 
 #====================================================================================================
 
+stickerTable = {
+    "1": ".png",
+    "2": ".png",
+    #"3": ".json" # WTF?,
+    "4": ".gif",
+}
+
+#====================================================================================================
+
 @messageEvent.handle()
 async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEvent):
     if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageCreateEvent) or event.channel_id != plugin_config.discord_channel:
@@ -24,7 +33,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
         logger.debug(f"检测Webhook [Webhookid: {event.webhook_id}]");
         return;
 
-    QQFunc = QQ(userNick=event.member.nick, userName=event.author.username);
+    QQFunc = QQ(userNick=event.member.nick, globalName=event.author.global_name ,userName=event.author.username);
     ReplyID = None;
     resuleMessage = ""
     
@@ -36,7 +45,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
 
     #====================================================================================================
 
-    # 看看有没有回复
+    # 查看回复
     if event.reply:
         discordMessage = await DB.find_by_discord_message_id(str(event.reply.id))
         messageList = await DiscordModule.GetTables(str(event.reply.id))
@@ -53,9 +62,18 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     if ReplyID:
         resuleMessage += OneBotMessageSegment.reply(ReplyID)
 
+    # 消息内容
     if event.content:
         resuleMessage += formatImg(event.content)
 
+    # 贴纸
+    if event.sticker_items:
+        for sticker in event.sticker_items:
+            stickerFormat = stickerTable[sticker.format_type.value]
+            if stickerFormat != None:
+                resuleMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}{stickerFormat}");
+
+    # 附件
     if event.attachments:
         for fileInfo in event.attachments:
             # 图片
@@ -70,7 +88,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
                     logger.info(f"File sent with message_id: {message_id}")
                     await DiscordModule.Update(str(event.id), message_id, "file")
 
-    
+    # 发送消息
     result = await QQFunc.sendGroup(OneBotMessage(resuleMessage));
     await DiscordModule.Update(str(event.id), result.get("message_id"), "content")
     

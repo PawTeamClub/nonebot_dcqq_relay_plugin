@@ -169,6 +169,9 @@ A3: 技术力不够~~因为懒~~
 # TODO:
 ~~做几把@，做不了一点~~
 
+1. 对类似tenor的图床添加支持
+  - opengraph? oEmbed? idk
+
 # 感谢
 
 - [nonebot/nonebot2](https://github.com/nonebot/nonebot2): 跨平台 Python 异步聊天机器人框架
