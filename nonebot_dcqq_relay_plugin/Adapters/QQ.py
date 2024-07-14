@@ -1,8 +1,11 @@
+import io
 from typing import Any, List, Optional, Union
+from pathlib import Path
 from nonebot.log import logger
+from moviepy.editor import VideoFileClip
 from nonebot_dcqq_relay_plugin.config import plugin_config;
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, EMOJI_PATTERN
-from nonebot_dcqq_relay_plugin.Core.global_functions import getFile
+from nonebot_dcqq_relay_plugin.Core.global_functions import getFile, generate_random_string
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
 from nonebot.adapters.discord.api import Attachment as DiscordAttachment
 
@@ -74,6 +77,44 @@ class QQ():
         image_url = image_source if isinstance(image_source, str) else image_source.url
         image_segment = OneBotMessageSegment.image(image_url)
         return await self.sendGroup(OneBotMessage(image_segment))
+
+    # 获得gif文件
+    async def getGIFFile(self, embedURL: str) -> Optional[bytes]:    
+        try:  
+            # 获取字节码
+            FileBytes, FileStateCode = await getFile(embedURL);
+            if FileBytes is None:
+                return None;
+            
+            # 创建一个字节流对象
+            byte_stream = io.BytesIO(FileBytes)
+            
+            # 从字节流读取视频
+            video = VideoFileClip(byte_stream)
+            
+            # 设置路径
+            output_path = bot_manager.DOWNLOAD_PATH / (generate_random_string() + ".gif");
+
+            # 确保输出路径是 Path 对象
+            output_path = Path(output_path).resolve()
+            
+            # 将视频转换为 GIF
+            video.write_gif(str(output_path))
+            
+            # 关闭视频对象
+            video.close()
+
+            # 获取GIF字节
+            gif_bytes = output_path.read_bytes()
+
+            # 删除文件
+            output_path.unlink()
+
+            # 返回字节
+            return gif_bytes
+        except Exception as e:
+            logger.error(f"Error in getGIFFile: {e}")
+            return None
 
     # 发送文件
     async def sendFile(self, fileInfo: DiscordAttachment) -> Optional[List[dict[str, Any]]]:

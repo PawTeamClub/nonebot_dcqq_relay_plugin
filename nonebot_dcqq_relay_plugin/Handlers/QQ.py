@@ -73,6 +73,16 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
             if stickerFormat != None:
                 resuleMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}{stickerFormat}");
 
+    # Discord嵌入式图片
+    if event.embeds:
+        for embed in event.embeds:
+            embedType = embed.type;
+            if embedType == "gifv" and embed.video is not None:
+                gifFile = await QQFunc.getGIFFile(embed.video.url);
+                resuleMessage += OneBotMessageSegment.image(gifFile)
+            elif embedType == "image" and embed.thumbnail is not None:
+                resuleMessage += OneBotMessageSegment.image(embed.thumbnail.url)
+
     # 附件
     if event.attachments:
         for fileInfo in event.attachments:

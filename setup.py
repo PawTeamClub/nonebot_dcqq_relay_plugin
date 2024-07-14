@@ -29,6 +29,7 @@ setuptools.setup(
         "nonebot2[httpx]>=2.3.1",
         "nonebot2[websockets]>=2.3.1",
         "tortoise-orm>=0.21.4",
-        "aiohttp>=3.9.5"
+        "aiohttp>=3.9.5",
+        "moviepy>=1.0.3"
     ],
 )
