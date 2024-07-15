@@ -44,6 +44,8 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 目前此插件还在早期开发阶段，还有许多问题，如果遇到问题还请务必提 [issue](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/issues)。
 
+**还未开发完成，而且代码太乱了，暂时不发布到nonebot市场，代整理一遍再去发布**
+
 <details>
 <summary>使用包管理器安装（推荐）</summary>
 在 nonebot2 项目的插件目录下, 打开命令行, 根据你使用的包管理器, 输入相应的安装命令
