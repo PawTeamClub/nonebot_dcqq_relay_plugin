@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="nonebot_dcqq_relay_plugin",
-    version="1.0.7",
+    version="1.0.8",
     author="Robonyantame",
     author_email="robonyantame@gmail.com",
     description="使用Nonebot2让Discord和QQ群实现互相通信",
@@ -30,6 +30,8 @@ setuptools.setup(
         "nonebot2[websockets]>=2.3.1",
         "tortoise-orm>=0.21.4",
         "aiohttp>=3.9.5",
-        "moviepy>=1.0.3"
+        "moviepy>=1.0.3",
+        "imageio>=2.34.2",
+        "lottie>=0.7.0"
     ],
 )

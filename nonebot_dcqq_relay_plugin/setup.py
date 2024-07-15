@@ -24,6 +24,7 @@ async def init():
     MainPath = getPathFolder(pathStr);
     bot_manager.DOWNLOAD_PATH = getPathFolder(MainPath / "download");
     bot_manager.DATABASE_PATH = getPathFolder(MainPath / "db");
+    bot_manager.TEMP_PATH = getPathFolder(MainPath / "temp");
     # 初始化数据库
     await DB.init(bot_manager.DATABASE_PATH);
 

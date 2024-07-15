@@ -1,8 +1,8 @@
-import aiohttp, shutil, httpx, random, string
+import httpx, shutil, random, string, lottie, aiohttp, imageio
 from typing import Union, Tuple, Optional
 from pathlib import Path
 from nonebot.log import logger
-
+from nonebot_dcqq_relay_plugin.Core.constants import bot_manager
 def getPathFolder(path: Union[str, Path]) -> Path:
     """
     确保指定的路径存在，如果不存在则创建它。
@@ -12,7 +12,7 @@ def getPathFolder(path: Union[str, Path]) -> Path:
         main_path.mkdir(parents=True, exist_ok=True);
     return main_path
 
-def generate_random_string(min: int = 6, max: int = 20) -> str:
+def generateRandomString(min: int = 6, max: int = 20) -> str:
     """随机生成一个最小和最大的字符串"""
     length = random.randint(min, max)  # 随机生成长度在6到20之间
     characters = string.ascii_letters + string.digits  # 包含大小写字母和数字
@@ -80,3 +80,106 @@ async def getHttpxFile(weblink: str) -> Tuple[Optional[bytes], int, Optional[str
     except Exception as e:
         logger.error(f"Unexpected error when fetching file: {e}", exc_info=True)
         return None, 0, None
+
+async def getFile_saveLocal2(weblink: str, fileName: str) -> Tuple[Optional[Path]]:
+    """
+    获得下载文件的路径
+    需要填写网站路径和完整文件名(包括文件后缀)
+    **需要一个可辨认的函数名**
+    """
+    if not weblink:
+        logger.error("[getFile_saveLocal2] - Empty Download Link")
+        return None
+
+    fileBytes, fileStateCode = await getFile(weblink)
+    if not fileBytes:
+        logger.error("[getFile_saveLocal2] - Empty Bytes")
+        return None
+
+    if not fileName:
+        logger.error("[getFile_saveLocal2] - Empty fileName")
+    
+    file_path = bot_manager.DOWNLOAD_PATH / fileName;
+
+    try:
+        file_path.write_bytes(fileBytes)
+        return file_path
+    except Exception as e:
+        logger.error(f"[getFile_saveLocal2] - file_path.write_bytes: {e}")
+        return None
+
+async def getFile_saveLocal(weblink: str, fileType: str, fileName: str = generateRandomString()) -> Tuple[Optional[Path], Optional[str]]:
+    """
+    获得下载文件的路径
+    需要填写网站路径和文件类型
+    如果fileName不填写，那么就会随机文件名称
+    """
+    if not weblink:
+        logger.error("[getFile_saveLocal2] - Empty Download Link")
+        return None
+
+    fileBytes, fileStateCode = await getFile(weblink)
+    if not fileBytes:
+        logger.error("[getFile_saveLocal] - Empty Bytes")
+        return None, None;
+
+    if not fileType:
+        logger.error("[getFile_saveLocal] - Empty fileType")
+        return None, None;
+    
+    file_path = bot_manager.DOWNLOAD_PATH / (fileName + f".{fileType}");
+
+    try:
+        file_path.write_bytes(fileBytes)
+        return file_path, fileName
+    except Exception as e:
+        logger.error(f"[getFile_saveLocal] - file_path.write_bytes: {e}")
+        return None, None
+
+async def apngToGif(apngLink: str) -> Optional[Path]:
+
+    if not apngLink:
+        logger.error("[apngToGif] - Empty apngLink")
+        return None
+    
+    apng_file, fileName = await getFile_saveLocal(apngLink, "png")
+    if not apng_file:
+        logger.error("[apngToGif] - Error filePath")
+        return None
+
+    gif_file = bot_manager.DOWNLOAD_PATH / (fileName + ".gif");
+
+    try:
+        reader = imageio.get_reader(apng_file, format='APNG')
+        writer = imageio.get_writer(gif_file, format='GIF', mode='I')
+        for frame in reader:
+            writer.append_data(frame)
+        writer.close()
+    except Exception as e:
+        logger.error(f"[apngToGif] - {e}")
+        return None
+
+    return gif_file
+
+async def lottieToGif(lottieLink: str) -> Optional[Path]:
+
+    if not lottieLink:
+        logger.error("[apngToGif] - Empty apngLink")
+        return None
+    
+    lottie_file, fileName = await getFile_saveLocal(lottieLink, "json")
+    if not lottie_file:
+        logger.error("[lottieToGif] - Error filePath")
+        return None
+
+    gif_file = bot_manager.DOWNLOAD_PATH / (fileName + ".gif");
+
+    try:
+        animation = lottie.parsers.tgs.parse_tgs(lottie_file)
+        frames = animation.frames()
+        imageio.mimsave(gif_file, frames, duration=animation.frame_rate)
+    except Exception as e:
+        logger.error(f"[lottieToGif] - {e}")
+        return None
+
+    return gif_file

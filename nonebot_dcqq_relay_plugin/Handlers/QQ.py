@@ -5,19 +5,11 @@ from nonebot_dcqq_relay_plugin.config import plugin_config
 from nonebot_dcqq_relay_plugin.Adapters.QQ import QQ, formatImg
 from nonebot_dcqq_relay_plugin.Database.db import DB, DiscordModule
 from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, noticeEvent
+from nonebot_dcqq_relay_plugin.Core.global_functions import apngToGif
 
 from nonebot.adapters.discord import Bot as DiscordBot#, MessageSegment as DiscordMessageSegment, Message as DiscordMessage
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
 from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageCreateEvent, MessageDeleteEvent as DiscordMessageDeleteEvent
-
-#====================================================================================================
-
-stickerTable = {
-    "1": ".png",
-    "2": ".png",
-    #"3": ".json" # WTF?,
-    "4": ".gif",
-}
 
 #====================================================================================================
 
@@ -69,9 +61,19 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     # 贴纸
     if event.sticker_items:
         for sticker in event.sticker_items:
-            stickerFormat = stickerTable[sticker.format_type.value]
-            if stickerFormat != None:
-                resuleMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}{stickerFormat}");
+            if sticker.format_type.value in [1, 4]:                         # PNG/GIF
+                extension = 'png' if sticker.format_type.value == 1 else 'gif'
+                resultMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}.{extension}")
+            elif sticker.format_type.value == 2:                            # APNG
+                gifPath = apngToGif(f"https://media.discordapp.net/stickers/{sticker.id}.png")
+                if not gifPath:
+                    continue;
+                resultMessage += OneBotMessageSegment.image(gifPath)
+            elif sticker.format_type.value == 3:                            # Lottie
+                lottiePath = apngToGif(f"https://media.discordapp.net/stickers/{sticker.id}.json")
+                if not lottiePath:
+                    continue;
+                resultMessage += OneBotMessageSegment.image(lottiePath);
 
     # Discord嵌入式图片
     if event.embeds:

@@ -3,7 +3,7 @@ from typing import List, Optional
 from nonebot.log import logger
 from nonebot_dcqq_relay_plugin.config import plugin_config
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, ENCODED_FACE_PATTERN
-from nonebot_dcqq_relay_plugin.Core.global_functions import getFile, getHttpxFile, generate_random_string
+from nonebot_dcqq_relay_plugin.Core.global_functions import getFile, getHttpxFile, generateRandomString
 from nonebot.adapters.discord.api import File, MessageGet, MessageReference
 from nonebot.adapters.onebot.v11 import (
     Bot as OneBotBot,
@@ -147,7 +147,7 @@ class Discord:
                     return None;
 
                 # 在想是传字节码好还是文件好
-                file = File(filename=generate_random_string() + imgtype, content=file_byte)
+                file = File(filename=generateRandomString() + imgtype, content=file_byte)
                 return await self.sendFile(file)
         elif segment.type == "mface":
             return await self.sendMessage(segment.data['url'])

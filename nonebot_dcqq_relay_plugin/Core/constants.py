@@ -13,6 +13,7 @@ class BotManager:
     DiscordBotObj: DiscordBot = None;
     webhook_id = None;
     webhook = None;
+    TEMP_PATH: Path = None;
     DOWNLOAD_PATH: Path = None;
     DATABASE_PATH: Path = None;
 
@@ -24,8 +25,9 @@ bot_manager = BotManager()
 BOT_NAME = "nonebot_dcqq_bot";
 
 # 正则表达
-EMOJI_PATTERN = re.compile(r'<:(\w+):(\d+)>');                  #Discord Emoji
+EMOJI_PATTERN = re.compile(r'<a?:(\w+):(\d+)>');                #Discord Emoji
 ENCODED_FACE_PATTERN = re.compile(r'&#91;([^&#]+)&#93;')        #QQ Mface Emoji
+
 #======================================================
 
 # 创建事件处理器
