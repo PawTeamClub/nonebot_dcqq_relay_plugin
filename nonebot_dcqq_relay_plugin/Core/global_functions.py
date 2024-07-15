@@ -6,12 +6,6 @@ from nonebot.log import logger
 def getPathFolder(path: Union[str, Path]) -> Path:
     """
     确保指定的路径存在，如果不存在则创建它。
-
-    Args:
-        path (Union[str, Path]): 要检查或创建的路径。
-
-    Returns:
-        Path: 确保存在的路径对象。
     """
     main_path = Path(path) if isinstance(path, str) else path
     if not main_path.exists():

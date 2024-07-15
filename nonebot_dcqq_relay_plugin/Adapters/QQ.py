@@ -86,32 +86,40 @@ class QQ():
             if FileBytes is None:
                 return None;
             
-            # 创建一个字节流对象
-            byte_stream = io.BytesIO(FileBytes)
+            randomFileName = generate_random_string();
+
+            # 写入mp4路径
+            # 有人说可以用bytes读取，但是我压根就读不起来，所以...
+            file_path = bot_manager.DOWNLOAD_PATH / (randomFileName + ".mp4");
+
+            try:
+                file_path.write_bytes(FileBytes);
+            except Exception as e:
+                logger.error(f"Error in getGIFFile - file_path.write_bytes: {e}")
+                return None
             
             # 从字节流读取视频
-            video = VideoFileClip(byte_stream)
+            video = VideoFileClip(str(file_path.resolve()))
             
             # 设置路径
-            output_path = bot_manager.DOWNLOAD_PATH / (generate_random_string() + ".gif");
-
-            # 确保输出路径是 Path 对象
-            output_path = Path(output_path).resolve()
+            output_path = bot_manager.DOWNLOAD_PATH / (randomFileName + ".gif");
             
             # 将视频转换为 GIF
-            video.write_gif(str(output_path))
+            video.write_gif(str(output_path.resolve()))
             
             # 关闭视频对象
             video.close()
 
             # 获取GIF字节
-            gif_bytes = output_path.read_bytes()
+            saveGIFBytes = output_path.read_bytes();
 
-            # 删除文件
+            # 刪除文件
+            file_path.unlink()
             output_path.unlink()
 
             # 返回字节
-            return gif_bytes
+            return saveGIFBytes
+
         except Exception as e:
             logger.error(f"Error in getGIFFile: {e}")
             return None
