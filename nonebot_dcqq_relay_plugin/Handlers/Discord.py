@@ -39,7 +39,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     #====================================================================================================
     user_name, avatar_url = await get_user_info(bot, event.group_id, event.user_id);
     DiscordFunc = Discord(user_name, avatar_url);
-
+    resultMessage = ""
     #====================================================================================================
 
     # 回复
@@ -70,12 +70,18 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
             res = await DiscordFunc.sendFace(segment)
             if res is not None:
                 await QQModule.Update(str(event.message_id), res.id, "image")
+        elif segment.type == "at":                                                  # 提及他人
+            atuser_name, atavatar_url  = await get_user_info(bot, event.group_id, segment.data.get("qq"));
+            resultMessage += f"@{atuser_name} ";
         elif segment.type != "text":                                                # 孩子也不知道有啥要做的
             logger.debug(f"检测到 CQ 码：\n类型: {segment.type}\n数据: {segment.data}")
         else:                                                                       # 统统转文字处理
-            logger.debug("segment.text: " + str(segment));
-            res = await DiscordFunc.sendMessage(segment)
-            await QQModule.Update(str(event.message_id), res.id, "content")
+            resultMessage += str(segment);
+
+    # 发送消息
+    if resultMessage and resultMessage != "":
+        res = await DiscordFunc.sendMessage(resultMessage)
+        await QQModule.Update(str(event.message_id), res.id, "content")
 
 # 上传群文件事件
 @noticeEvent.handle()
