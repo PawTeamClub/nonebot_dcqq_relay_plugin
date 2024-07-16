@@ -56,7 +56,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
 
     # 消息内容
     if event.content:
-        resuleMessage += formatAT(formatImg(event.content))
+        resuleMessage += await formatAT(formatImg(event.content))
 
     # 贴纸
     if event.sticker_items:
