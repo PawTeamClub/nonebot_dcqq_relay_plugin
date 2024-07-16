@@ -157,6 +157,7 @@ async def apngToGif(apngLink: str) -> Optional[bytes]:
         for frame in reader:
             writer.append_data(frame)
         writer.close()
+        reader.close()
     except Exception as e:
         logger.error(f"[apngToGif] - {e}")
         return None
