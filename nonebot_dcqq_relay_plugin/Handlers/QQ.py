@@ -2,10 +2,10 @@
 from nonebot.log import logger
 
 from nonebot_dcqq_relay_plugin.config import plugin_config
-from nonebot_dcqq_relay_plugin.Adapters.QQ import QQ, formatImg
+from nonebot_dcqq_relay_plugin.Adapters.QQ import QQ, formatImg, formatAT
 from nonebot_dcqq_relay_plugin.Database.db import DB, DiscordModule
 from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, noticeEvent
-from nonebot_dcqq_relay_plugin.Core.global_functions import apngToGif
+from nonebot_dcqq_relay_plugin.Core.global_functions import apngToGif, lottieToGif
 
 from nonebot.adapters.discord import Bot as DiscordBot#, MessageSegment as DiscordMessageSegment, Message as DiscordMessage
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
@@ -15,7 +15,7 @@ from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageC
 
 @messageEvent.handle()
 async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEvent):
-    if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageCreateEvent) or event.channel_id != plugin_config.discord_channel:
+    if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageCreateEvent) or event.channel_id != plugin_config.discord_channel or event.guild_id != plugin_config.discord_guild:
         return;
 
     await DiscordModule.Create(str(event.id))
@@ -56,24 +56,24 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
 
     # 消息内容
     if event.content:
-        resuleMessage += formatImg(event.content)
+        resuleMessage += formatAT(formatImg(event.content))
 
     # 贴纸
     if event.sticker_items:
         for sticker in event.sticker_items:
             if sticker.format_type.value in [1, 4]:                         # PNG/GIF
                 extension = 'png' if sticker.format_type.value == 1 else 'gif'
-                resultMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}.{extension}")
+                resuleMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}.{extension}")
             elif sticker.format_type.value == 2:                            # APNG
-                gifPath = apngToGif(f"https://media.discordapp.net/stickers/{sticker.id}.png")
+                gifPath = await apngToGif(f"https://media.discordapp.net/stickers/{sticker.id}.png")
                 if not gifPath:
                     continue;
-                resultMessage += OneBotMessageSegment.image(gifPath)
+                resuleMessage += OneBotMessageSegment.image(gifPath)
             elif sticker.format_type.value == 3:                            # Lottie
-                lottiePath = apngToGif(f"https://media.discordapp.net/stickers/{sticker.id}.json")
+                lottiePath = await lottieToGif(f"https://discord.com/stickers/{sticker.id}.json")
                 if not lottiePath:
                     continue;
-                resultMessage += OneBotMessageSegment.image(lottiePath);
+                resuleMessage += OneBotMessageSegment.image(lottiePath);
 
     # Discord嵌入式图片
     if event.embeds:
@@ -89,7 +89,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     if event.attachments:
         for fileInfo in event.attachments:
             # 图片
-            if "image" in fileInfo.content_type.lower():
+            if fileInfo.content_type and "image" in fileInfo.content_type.lower():
                 resuleMessage += OneBotMessageSegment.image(fileInfo.url);
                 continue;
             # 文件
@@ -101,8 +101,9 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
                     await DiscordModule.Update(str(event.id), message_id, "file")
 
     # 发送消息
-    result = await QQFunc.sendGroup(OneBotMessage(resuleMessage));
-    await DiscordModule.Update(str(event.id), result.get("message_id"), "content")
+    if resuleMessage:
+        result = await QQFunc.sendGroup(OneBotMessage(resuleMessage));
+        await DiscordModule.Update(str(event.id), result.get("message_id"), "content")
     
 
 #@todo: delete_msg有异常，怀疑是Lagrange.Onebot的问题

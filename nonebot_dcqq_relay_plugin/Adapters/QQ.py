@@ -1,10 +1,10 @@
-import io
+import re
 from typing import Any, List, Optional, Union
 from pathlib import Path
 from nonebot.log import logger
 from moviepy.editor import VideoFileClip
 from nonebot_dcqq_relay_plugin.config import plugin_config;
-from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, EMOJI_PATTERN
+from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, EMOJI_PATTERN, DISCORD_AT_PATTERN
 from nonebot_dcqq_relay_plugin.Core.global_functions import getFile, getFile_saveLocal, getFile_saveLocal2
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
 from nonebot.adapters.discord.api import Attachment as DiscordAttachment
@@ -57,26 +57,43 @@ def formatImg(content: str):
     # 包装成OneBot消息后返回
     return OneBotMessage(segments);
 
+def formatName(userName: str, userNick: Optional[str], global_name: Optional[str]):
+    if userNick:
+        return f"{userNick} ({userName})"
+    elif global_name:
+        return f"{global_name} ({userName})"
+    else:
+        return userName;
+
+def formatAT(content: str):
+    # 如果文本为空就返回空文本
+    if not content:
+        return ""
+
+    # 替换函数
+    def replace_user_id(match):
+        user_id = match.group(1)
+        
+        # 获取用户信息
+        user = bot_manager.DiscordBotObj.get_guild_member(guild_id=int(plugin_config.discord_guild), user_id=int(user_id))
+        
+        # 返回格式化的用户名
+        return f"@{formatName(user.nick, user.user.username, user.user.global_name)}"
+
+    # 使用 re.sub 进行替换
+    formatted_content = re.sub(DISCORD_AT_PATTERN, replace_user_id, content)
+
+    return formatted_content
+
 class QQ():
     
     # 构造函数
     def __init__(self, userName: str, globalName: Optional[str], userNick: Optional[str] = None):
-        self.userName = userName;
-        self.global_name = globalName;
-        self.userNick = userNick;
-
-    # 获取名称
-    def getName(self) -> str:
-        if self.userNick:
-            return f"{self.userNick} ({self.userName})"
-        elif self.global_name:
-            return f"{self.global_name} ({self.userName})"
-        else:
-            return self.userName;
+        self.Name = formatName(userName, userNick, globalName);
 
     # 发送文字
     async def sendGroup(self, Message: Union[str, OneBotMessage]) -> dict[str, Any]:
-        message = f"[{self.getName()}]:\n{Message}";
+        message = f"[{self.Name}]:\n{Message}";
         return await bot_manager.OneBotObj.send_group_msg(group_id=int(plugin_config.onebot_channel), message=message);
     
     # 发送图片

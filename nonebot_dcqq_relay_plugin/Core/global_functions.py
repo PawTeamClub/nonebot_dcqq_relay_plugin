@@ -1,8 +1,10 @@
-import httpx, shutil, random, string, lottie, aiohttp, imageio
+import httpx, shutil, random, string, aiohttp, imageio, pyrlottie
 from typing import Union, Tuple, Optional
 from pathlib import Path
 from nonebot.log import logger
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager
+from PIL import Image
+
 def getPathFolder(path: Union[str, Path]) -> Path:
     """
     确保指定的路径存在，如果不存在则创建它。
@@ -136,12 +138,12 @@ async def getFile_saveLocal(weblink: str, fileType: str, fileName: str = generat
         logger.error(f"[getFile_saveLocal] - file_path.write_bytes: {e}")
         return None, None
 
-async def apngToGif(apngLink: str) -> Optional[Path]:
+async def apngToGif(apngLink: str) -> Optional[bytes]:
 
     if not apngLink:
         logger.error("[apngToGif] - Empty apngLink")
         return None
-    
+
     apng_file, fileName = await getFile_saveLocal(apngLink, "png")
     if not apng_file:
         logger.error("[apngToGif] - Error filePath")
@@ -159,9 +161,13 @@ async def apngToGif(apngLink: str) -> Optional[Path]:
         logger.error(f"[apngToGif] - {e}")
         return None
 
-    return gif_file
+    gif_bytes = gif_file.read_bytes();
+    apng_file.unlink()
+    gif_file.unlink()
 
-async def lottieToGif(lottieLink: str) -> Optional[Path]:
+    return gif_bytes
+
+async def lottieToGif(lottieLink: str) -> Optional[bytes]:
 
     if not lottieLink:
         logger.error("[apngToGif] - Empty apngLink")
@@ -171,15 +177,20 @@ async def lottieToGif(lottieLink: str) -> Optional[Path]:
     if not lottie_file:
         logger.error("[lottieToGif] - Error filePath")
         return None
-
+    
     gif_file = bot_manager.DOWNLOAD_PATH / (fileName + ".gif");
 
     try:
-        animation = lottie.parsers.tgs.parse_tgs(lottie_file)
-        frames = animation.frames()
-        imageio.mimsave(gif_file, frames, duration=animation.frame_rate)
+        await pyrlottie.convSingleLottie(
+            lottieFile=pyrlottie.LottieFile(str(lottie_file.resolve())),
+            destFiles={str(gif_file.resolve())}
+        )
     except Exception as e:
         logger.error(f"[lottieToGif] - {e}")
         return None
+    
+    gif_bytes = gif_file.read_bytes();
+    lottie_file.unlink()
+    gif_file.unlink()
 
-    return gif_file
+    return gif_bytes
