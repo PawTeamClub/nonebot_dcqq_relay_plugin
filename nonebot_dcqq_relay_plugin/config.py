@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 class Config(BaseModel):
   data_dir: Optional[str] = None
+  discord_guild: int;
   discord_channel: int;
   onebot_channel: int;
 

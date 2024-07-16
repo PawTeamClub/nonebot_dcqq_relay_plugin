@@ -89,6 +89,18 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 # 配置
 
+## DISCORD_GUILD
+
+**你需要开启Discord的开发者模式获取服务器ID**
+
+填写需要转发的Discord服务器ID
+
+[如果你不知道怎么开启开发者模式，点我](https://beebom.com/how-enable-disable-developer-mode-discord/#:~:text=Turn%20on%20Discord%20Developer%20Mode%20%28Android%2C%20iOS%29%201,access%20the%20IDs%20of%20channels%20and%20messages.%20)
+
+```json
+DISCORD_GUILD="1234567890000000000000"
+```
+
 ## DISCORD_CHANNEL
 
 **你需要开启Discord的开发者模式获取频道ID**
@@ -124,6 +136,7 @@ DATA_DIR="./data/"
 DRIVER=~fastapi+~httpx+~websockets
 
 # nonebot_dcqq_relay_plugin配置
+DISCORD_GUILD="1234567890000000000000"
 DISCORD_CHANNEL="1234567890000000000000"
 ONEBOT_CHANNEL="123456789"
 
