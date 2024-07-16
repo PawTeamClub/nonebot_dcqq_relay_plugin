@@ -65,23 +65,32 @@ def formatName(userName: str, userNick: Optional[str], global_name: Optional[str
     else:
         return userName;
 
-def formatAT(content: str):
-    # 如果文本为空就返回空文本
+async def formatAT(content: str):
     if not content:
         return ""
+    
+    content = str(content)
+    matches = list(DISCORD_AT_PATTERN.finditer(content))
+    
+    if not matches:
+        return content
 
-    # 替换函数
-    def replace_user_id(match):
+    segments = []
+    last_end = 0
+
+    for match in matches:
         user_id = match.group(1)
-        
-        # 获取用户信息
-        user = bot_manager.DiscordBotObj.get_guild_member(guild_id=int(plugin_config.discord_guild), user_id=int(user_id))
-        
-        # 返回格式化的用户名
-        return f"@{formatName(user.nick, user.user.username, user.user.global_name)}"
+        start = match.start()
+        end = match.end()
+        user = await bot_manager.DiscordBotObj.get_guild_member(guild_id=int(plugin_config.discord_guild), user_id=int(user_id))
 
-    # 使用 re.sub 进行替换
-    formatted_content = re.sub(DISCORD_AT_PATTERN, replace_user_id, content)
+        segments.append(content[last_end:start])
+        segments.append(f"@{formatName(user.nick, user.user.username, user.user.global_name)}")
+
+        last_end = end
+
+    segments.append(content[last_end:])
+    formatted_content = ''.join(segments)
 
     return formatted_content
 
