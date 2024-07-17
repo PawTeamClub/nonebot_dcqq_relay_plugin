@@ -51,7 +51,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
             await QQModule.Update(str(event.message_id), res.id, "reply")
         else:
             QQDB = await QQModule.GetTables(reply_id)
-            if QQDB is not None:
+            if QQDB is not None and len(QQDB) > 0:
                 segment = QQDB[-1]['id']
                 logger.info(f"reply_id: {segment}")
                 res = await DiscordFunc.reply(int(segment));
