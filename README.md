@@ -14,7 +14,7 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 | [介绍](#介绍) - [支援功能](#功能) - [安装](#安装) - [感谢](#感谢)|
 :----------------------------------------------------------: |
-| [Q&A](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/Q&A) - [BUG列表](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/Bug-list) - [**(务必查看)**env配置](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/Config) - [TODO](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/TODO)|
+| [Q&A](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/Q&A) - [BUG列表](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/Bug-list) - [(务必查看) env配置](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/Config) - [TODO](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/wiki/TODO)|
 
 </div>
 
@@ -55,6 +55,8 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 然后这是我的python初作品(此前没写过任何一个python语言的东西)，所以可能代码层面不太理想，请见谅。 :(
 
 如果遇到问题还请务必提 [issue](https://github.com/PawTeamClub/nonebot_dcqq_relay_plugin/issues)。
+
+---
 
 <details>
 <summary>使用包管理器安装（目前推荐）</summary>
