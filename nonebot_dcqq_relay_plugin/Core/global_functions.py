@@ -1,9 +1,10 @@
-import httpx, shutil, random, string, aiohttp, imageio, pyrlottie
+import httpx, shutil, random, string, aiohttp, imageio, pyrlottie, numpy
+
+from PIL import Image
 from typing import Union, Tuple, Optional
 from pathlib import Path
 from nonebot.log import logger
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager
-from PIL import Image
 
 def getPathFolder(path: Union[str, Path]) -> Path:
     """
@@ -154,8 +155,19 @@ async def apngToGif(apngLink: str) -> Optional[bytes]:
     try:
         reader = imageio.get_reader(apng_file, format='APNG')
         writer = imageio.get_writer(gif_file, format='GIF', mode='I')
+
+        first_frame = reader.get_data(0)
+        width, height = first_frame.shape[1], first_frame.shape[0]
+
         for frame in reader:
-            writer.append_data(frame)
+            pil_frame = Image.fromarray(frame)
+            background = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+            combined = Image.alpha_composite(background, pil_frame)
+            rgb_frame = combined.convert("RGB")
+            numpy_frame = numpy.array(rgb_frame)
+            writer.append_data(numpy_frame)
+            background.paste(pil_frame)
+        
         writer.close()
         reader.close()
     except Exception as e:
