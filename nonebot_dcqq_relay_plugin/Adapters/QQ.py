@@ -5,7 +5,7 @@ from nonebot.log import logger
 from moviepy.editor import VideoFileClip
 from nonebot_dcqq_relay_plugin.config import plugin_config;
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager, EMOJI_PATTERN, DISCORD_AT_PATTERN
-from nonebot_dcqq_relay_plugin.Core.global_functions import getFile, getFile_saveLocal, getFile_saveLocal2
+from nonebot_dcqq_relay_plugin.Core.global_functions import getFile_saveLocal, getFile_saveLocal2
 from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
 from nonebot.adapters.discord.api import Attachment as DiscordAttachment
 
@@ -16,7 +16,7 @@ def formatImg(content: str):
     # 如果文本空的就返回空文本
     if not content:
         return "";
-
+    
     # 如果没有符合正则表达式的直接返回文本
     emojis = EMOJI_PATTERN.findall(content)
     if not emojis:
@@ -70,28 +70,31 @@ async def formatAT(content: str):
         return ""
     
     content = str(content)
-    matches = list(DISCORD_AT_PATTERN.finditer(content))
-    
+
+    matches = DISCORD_AT_PATTERN.findall(content)
     if not matches:
-        return content
+        return content;
 
     segments = []
     last_end = 0
 
-    for match in matches:
+    for match in DISCORD_AT_PATTERN.finditer(content):
         user_id = match.group(1)
         start = match.start()
         end = match.end()
         user = await bot_manager.DiscordBotObj.get_guild_member(guild_id=int(plugin_config.discord_guild), user_id=int(user_id))
 
-        segments.append(content[last_end:start])
-        segments.append(f"@{formatName(user.nick, user.user.username, user.user.global_name)}")
+        if start > last_end:
+            segments.append(content[last_end:start])
+
+        segments.append(f"@{user.user.global_name}({user.user.username})")
 
         last_end = end
 
-    segments.append(content[last_end:])
-    formatted_content = ''.join(segments)
+    if last_end < len(content):
+        segments.append(content[last_end:])
 
+    formatted_content = ''.join(segments)
     return formatted_content
 
 class QQ():

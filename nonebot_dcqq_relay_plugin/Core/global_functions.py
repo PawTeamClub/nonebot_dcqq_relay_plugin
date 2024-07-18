@@ -1,10 +1,18 @@
-import httpx, shutil, random, string, aiohttp, imageio, pyrlottie, numpy
+import os, numpy, httpx, shutil, random, string, aiohttp, imageio, pyrlottie
 
 from PIL import Image
 from typing import Union, Tuple, Optional
 from pathlib import Path
 from nonebot.log import logger
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager
+
+def get_file_extension(url):
+    """
+    分割文件名和扩展名
+    """
+    _, extension = os.path.splitext(url)
+    #return extension
+    return extension[1:]
 
 def getPathFolder(path: Union[str, Path]) -> Path:
     """
