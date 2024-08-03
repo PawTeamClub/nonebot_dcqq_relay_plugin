@@ -2,7 +2,7 @@
 from nonebot.log import logger
 
 from nonebot_dcqq_relay_plugin.config import plugin_config
-from nonebot_dcqq_relay_plugin.Adapters.QQ import QQ, formatImg, formatAT
+from nonebot_dcqq_relay_plugin.Adapters.QQ import QQ, formatEmoji, formatAT
 from nonebot_dcqq_relay_plugin.Database.db import DB, DiscordModule
 from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, noticeEvent
 from nonebot_dcqq_relay_plugin.Core.global_functions import apngToGif, lottieToGif
@@ -18,12 +18,12 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageCreateEvent) or event.channel_id != plugin_config.discord_channel or event.guild_id != plugin_config.discord_guild:
         return;
 
-    await DiscordModule.Create(str(event.id))
-
     # 此检测是为了防止转发机器人抽风
     if event.webhook_id == bot_manager.webhook_id:
         logger.debug(f"检测Webhook [Webhookid: {event.webhook_id}]");
         return;
+
+    await DiscordModule.Create(str(event.id))
 
     QQFunc = QQ(userNick=event.member.nick, globalName=event.author.global_name ,userName=event.author.username);
     ReplyID = None;
@@ -57,7 +57,7 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     # 消息内容
     if event.content:
         formatted_at = await formatAT(event.content)
-        resuleMessage += formatImg(formatted_at)
+        resuleMessage += formatEmoji(formatted_at)
 
     # 贴纸
     if event.sticker_items:
@@ -66,12 +66,12 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
                 extension = 'png' if sticker.format_type.value == 1 else 'gif'
                 resuleMessage += OneBotMessageSegment.image(f"https://media.discordapp.net/stickers/{sticker.id}.{extension}")
             elif sticker.format_type.value == 2:                            # APNG
-                gifPath = await apngToGif(f"https://media.discordapp.net/stickers/{sticker.id}.png")
+                gifPath = await apngToGif(sticker.id)
                 if not gifPath:
                     continue;
                 resuleMessage += OneBotMessageSegment.image(gifPath)
             elif sticker.format_type.value == 3:                            # Lottie
-                lottiePath = await lottieToGif(f"https://discord.com/stickers/{sticker.id}.json")
+                lottiePath = await lottieToGif(sticker.id)
                 if not lottiePath:
                     continue;
                 resuleMessage += OneBotMessageSegment.image(lottiePath);
@@ -117,7 +117,10 @@ async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDe
     discordMessage = await DB.find_by_discord_message_id(str(event.id))
     try:
         if discordMessage:
-            await bot_manager.OneBotObj.delete_msg(message_id=int(discordMessage.onebot_message_id));
+            discordMessageID = int(discordMessage.onebot_message_id)
+            msg = await bot_manager.OneBotObj.get_msg(message_id=discordMessageID)
+            if msg:
+                await bot_manager.OneBotObj.delete_msg(message_id=discordMessageID);
             return;
     except Exception as e:
         pass;
@@ -128,4 +131,7 @@ async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDe
         return;
 
     for segment in messageList:
-        await bot_manager.OneBotObj.delete_msg(message_id=int(segment));
+        messageID = int(segment);
+        msg = await bot_manager.OneBotObj.get_msg(message_id=messageID)
+        if msg:
+            await bot_manager.OneBotObj.delete_msg(message_id=messageID);

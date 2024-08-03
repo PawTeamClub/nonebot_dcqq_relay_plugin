@@ -22,13 +22,13 @@ from nonebot.adapters.onebot.v11 import (
 async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     if not bot_manager.DiscordBotObj or not isinstance(event, OneBotGroupMessageEvent) or event.group_id != plugin_config.onebot_channel:
         return
-    
-    await QQModule.Create(str(event.message_id));
 
     # 防止机器人自己转发自己的消息
     login_info = await bot.get_login_info()
     if event.user_id == login_info["user_id"]:
         return;
+
+    await QQModule.Create(str(event.message_id));
 
     #====================================================================================================
 

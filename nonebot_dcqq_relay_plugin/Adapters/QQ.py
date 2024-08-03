@@ -12,7 +12,7 @@ from nonebot.adapters.discord.api import Attachment as DiscordAttachment
 #=================================================
 
 # Emoji正则表达
-def formatImg(content: str):
+def formatEmoji(content: str):
     # 如果文本空的就返回空文本
     if not content:
         return "";
@@ -28,12 +28,8 @@ def formatImg(content: str):
 
     # 遍历
     for match in EMOJI_PATTERN.finditer(content):
-        emoji_full = match.group(0)
-        emoji_name = match.group(1)
-        emoji_id = match.group(2)
-        
-        start = match.start()
-        end = match.end()
+        emoji_full, emoji_name, emoji_id = match.group(0), match.group(1), match.group(2)
+        start, end = match.start(), match.end()
 
         # 添加表情前的文本
         if start > last_end:
@@ -56,6 +52,9 @@ def formatImg(content: str):
 
     # 包装成OneBot消息后返回
     return OneBotMessage(segments);
+
+def formatImg(content: str):
+    pass;
 
 def formatName(userName: str, userNick: Optional[str], global_name: Optional[str]):
     if userNick:
@@ -80,8 +79,7 @@ async def formatAT(content: str):
 
     for match in DISCORD_AT_PATTERN.finditer(content):
         user_id = match.group(1)
-        start = match.start()
-        end = match.end()
+        start, end = match.start(), match.end()
         user = await bot_manager.DiscordBotObj.get_guild_member(guild_id=int(plugin_config.discord_guild), user_id=int(user_id))
 
         if start > last_end:

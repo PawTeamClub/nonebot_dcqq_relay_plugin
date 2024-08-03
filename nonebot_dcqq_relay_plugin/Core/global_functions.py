@@ -5,6 +5,7 @@ from typing import Union, Tuple, Optional
 from pathlib import Path
 from nonebot.log import logger
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager
+from nonebot.adapters.discord.api import Snowflake
 
 def get_file_extension(url):
     """
@@ -147,13 +148,13 @@ async def getFile_saveLocal(weblink: str, fileType: str, fileName: str = generat
         logger.error(f"[getFile_saveLocal] - file_path.write_bytes: {e}")
         return None, None
 
-async def apngToGif(apngLink: str) -> Optional[bytes]:
+async def apngToGif(apngID: Union[Snowflake, int]) -> Optional[bytes]:
 
-    if not apngLink:
-        logger.error("[apngToGif] - Empty apngLink")
+    if not apngID:
+        logger.error("[apngToGif] - Empty apngID")
         return None
 
-    apng_file, fileName = await getFile_saveLocal(apngLink, "png")
+    apng_file, fileName = await getFile_saveLocal(f"https://media.discordapp.net/stickers/{apngID}.png", "png")
     if not apng_file:
         logger.error("[apngToGif] - Error filePath")
         return None
@@ -188,13 +189,13 @@ async def apngToGif(apngLink: str) -> Optional[bytes]:
 
     return gif_bytes
 
-async def lottieToGif(lottieLink: str) -> Optional[bytes]:
+async def lottieToGif(lottieid: Union[Snowflake, int]) -> Optional[bytes]:
 
-    if not lottieLink:
-        logger.error("[apngToGif] - Empty apngLink")
+    if not lottieid:
+        logger.error("[apngToGif] - Empty lottieid")
         return None
     
-    lottie_file, fileName = await getFile_saveLocal(lottieLink, "json")
+    lottie_file, fileName = await getFile_saveLocal(f"https://discord.com/stickers/{lottieid}.json", "json")
     if not lottie_file:
         logger.error("[lottieToGif] - Error filePath")
         return None
