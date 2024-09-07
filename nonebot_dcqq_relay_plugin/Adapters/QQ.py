@@ -1,5 +1,5 @@
 import re
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Union, Pattern, Callable
 from pathlib import Path
 from nonebot.log import logger
 from moviepy.editor import VideoFileClip
@@ -11,49 +11,92 @@ from nonebot.adapters.discord.api import Attachment as DiscordAttachment
 
 #=================================================
 
+def _format(pattern: Pattern[str], content: str, callbacks: Union[Callable, None] = None):
+    if not pattern or not content:
+        return ""
+    
+    check = pattern.findall(content)
+    if not check:
+        return content
+    
+    segments = []
+    last_end = 0
+    
+    for match in pattern.finditer(content):
+        start, end = match.start(), match.end()
+        if start > last_end:
+            segments.append(content[last_end:start])
+        
+        if callable(callbacks):
+            func_result = callbacks(match)
+            if func_result is not None:
+                segments.append(func_result)
+        else:
+            segments.append(match.group(0))
+            
+        last_end = end
+        
+    if last_end < len(content):
+        segments.append(content[last_end:])
+        
+    return segments
+
+async def _async_format(pattern: Pattern[str], content: str, callbacks: Union[Callable, None] = None):
+    if not pattern or not content:
+        return ""
+    
+    check = pattern.findall(content)
+    if not check:
+        return content
+    
+    segments = []
+    last_end = 0
+    
+    for match in pattern.finditer(content):
+        start, end = match.start(), match.end()
+        if start > last_end:
+            segments.append(content[last_end:start])
+        
+        if callable(callbacks):
+            func_result = await callbacks(match)
+            if func_result is not None:
+                segments.append(func_result)
+        else:
+            segments.append(match.group(0))
+            
+        last_end = end
+        
+    if last_end < len(content):
+        segments.append(content[last_end:])
+        
+    return segments
+
+#=================================================
+
 # Emoji正则表达
 def formatEmoji(content: str):
     # 如果文本空的就返回空文本
     if not content:
         return "";
     
-    # 如果没有符合正则表达式的直接返回文本
-    emojis = EMOJI_PATTERN.findall(content)
-    if not emojis:
-        return content;
-
-    # 局部变量
-    segments = []
-    last_end = 0
-
-    # 遍历
-    for match in EMOJI_PATTERN.finditer(content):
-        emoji_full, emoji_name, emoji_id = match.group(0), match.group(1), match.group(2)
-        start, end = match.start(), match.end()
-
-        # 添加表情前的文本
-        if start > last_end:
-            segments.append(OneBotMessageSegment.text(content[last_end:start]))
-
-        # 判断表情类型并获取相应的 URL
-        if emoji_full.startswith('<a:'):
-            emoji_url = f'https://cdn.discordapp.com/emojis/{emoji_id}.gif'
-        else:
-            emoji_url = f'https://cdn.discordapp.com/emojis/{emoji_id}.png'
-
-        # 添加转换后的表情（使用 CQ 码）
-        segments.append(OneBotMessageSegment.image(emoji_url))
-
-        last_end = end
-
-    # 添加最后一个表情后的文本
-    if last_end < len(content):
-        segments.append(OneBotMessageSegment.text(content[last_end:]))
+    # 表达替换
+    result = _format(EMOJI_PATTERN, content, lambda match: OneBotMessageSegment.image(
+        f'https://cdn.discordapp.com/emojis/{match.group(2)}.gif' 
+        if match.group(0).startswith('<a:') 
+        else f'https://cdn.discordapp.com/emojis/{match.group(2)}.png'
+    ))
 
     # 包装成OneBot消息后返回
-    return OneBotMessage(segments);
+    return OneBotMessage(result);
 
 def formatImg(content: str):
+    '''
+    @todo: 
+    此处是处理TODO#4的问题
+    但是在想如果UpdateMessagesEvent会修正我是否还要处理这个问题
+    因为到时候还要为了处理discord编辑信息的事件
+    到时候想想
+    '''
     pass;
 
 def formatName(userName: str, userNick: Optional[str], global_name: Optional[str]):
@@ -69,31 +112,14 @@ async def formatAT(content: str):
         return ""
     
     content = str(content)
-
-    matches = DISCORD_AT_PATTERN.findall(content)
-    if not matches:
-        return content;
-
-    segments = []
-    last_end = 0
-
-    for match in DISCORD_AT_PATTERN.finditer(content):
+    async def re_format(match):
         user_id = match.group(1)
-        start, end = match.start(), match.end()
         user = await bot_manager.DiscordBotObj.get_guild_member(guild_id=int(plugin_config.discord_guild), user_id=int(user_id))
-
-        if start > last_end:
-            segments.append(content[last_end:start])
-
-        segments.append(f"@{user.user.global_name}({user.user.username})")
-
-        last_end = end
-
-    if last_end < len(content):
-        segments.append(content[last_end:])
-
-    formatted_content = ''.join(segments)
-    return formatted_content
+        return f"@{user.user.global_name}({user.user.username})"
+        
+    result = await _async_format(DISCORD_AT_PATTERN, content, re_format)
+    
+    return ''.join(result)
 
 class QQ():
     

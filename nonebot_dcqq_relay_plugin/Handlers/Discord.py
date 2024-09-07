@@ -57,9 +57,6 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
                 res = await DiscordFunc.reply(int(segment));
                 await QQModule.Update(str(event.message_id), str(res.id), "reply")
 
-    # 回复
-    # None
-
     # 遍历信息获取常见CQ码
     for segment in event.message:
         logger.debug("segment.type: " + str(segment.type));

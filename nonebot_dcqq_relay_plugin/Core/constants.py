@@ -25,8 +25,9 @@ bot_manager = BotManager()
 BOT_NAME = "nonebot_dcqq_bot";
 
 # 正则表达
-EMOJI_PATTERN = re.compile(r'<a?:(\w+):(\d+)>');                #Discord Emoji
-ENCODED_FACE_PATTERN = re.compile(r'&#91;([^&#]+)&#93;')        #QQ Mface Emoji
+EMOJI_PATTERN = re.compile(r'<a?:(\w+):(\d+)>');                                # Discord Emoji
+GLOBAL_URL_MARKDOWN_PATTERN = re.compile(r'\[(.*?)\]\((https?://[^\s\)]+)\)')   # 通用MarkDown匹配链接
+ENCODED_FACE_PATTERN = re.compile(r'&#91;([^&#]+)&#93;')                        # QQ Mface Emoji
 DISCORD_AT_PATTERN = re.compile(r'<@(\d+)>')
 
 #======================================================
