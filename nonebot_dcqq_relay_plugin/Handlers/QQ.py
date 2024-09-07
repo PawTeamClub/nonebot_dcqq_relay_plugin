@@ -8,8 +8,15 @@ from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, 
 from nonebot_dcqq_relay_plugin.Core.global_functions import apngToGif, lottieToGif
 
 from nonebot.adapters.discord import Bot as DiscordBot#, MessageSegment as DiscordMessageSegment, Message as DiscordMessage
-from nonebot.adapters.onebot.v11 import Message as OneBotMessage, MessageSegment as OneBotMessageSegment
-from nonebot.adapters.discord.event import MessageCreateEvent as DiscordMessageCreateEvent, MessageDeleteEvent as DiscordMessageDeleteEvent
+from nonebot.adapters.onebot.v11 import (
+    Message as OneBotMessage, 
+    MessageSegment as OneBotMessageSegment
+)
+from nonebot.adapters.discord.event import (
+    MessageCreateEvent as DiscordMessageCreateEvent, 
+    MessageDeleteEvent as DiscordMessageDeleteEvent,
+    MessageUpdateEvent as DiscordMessageUpdateEvent
+)
 
 #====================================================================================================
 
@@ -108,12 +115,13 @@ async def handle_discord_message(bot: DiscordBot, event: DiscordMessageCreateEve
     
 
 #@todo: delete_msg有异常，怀疑是Lagrange.Onebot的问题
+#这部分的注释有一点乱，需要整理
 @noticeEvent.handle()
 async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDeleteEvent):
     if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageDeleteEvent) or event.channel_id != plugin_config.discord_channel:
         return;
 
-    # Discord撤回QQ用户消息
+    # Discord撤回后查询是否已经发送到QQ，如果有消息删除
     discordMessage = await DB.find_by_discord_message_id(str(event.id))
     try:
         if discordMessage:
@@ -126,6 +134,7 @@ async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDe
         pass;
     
     # Discord用户自主撤回
+    # 忘了是因为什么了，好像是数据库缺陷
     messageList = await DiscordModule.GetIDs(str(event.id))
     if not messageList or len(messageList) <= 0:
         return;
@@ -135,3 +144,15 @@ async def handle_discord_delete_message(bot: DiscordBot, event: DiscordMessageDe
         msg = await bot_manager.OneBotObj.get_msg(message_id=messageID)
         if msg:
             await bot_manager.OneBotObj.delete_msg(message_id=messageID);
+
+# 这是处理discord编辑事件的地方
+# 但我不知道是否可用，目前的开发环境不支持我测试（该死的乡下）
+# 待我回去再做测试
+@noticeEvent.handle()
+async def handle_discord_update_message(bot: DiscordBot, event: DiscordMessageUpdateEvent):
+    if not bot_manager.OneBotObj or not isinstance(event, DiscordMessageUpdateEvent) or event.channel_id != plugin_config.discord_channel:
+        return;
+    
+    # 应该和撤回差不多的代码
+    
+    pass;

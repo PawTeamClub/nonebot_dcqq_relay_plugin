@@ -37,9 +37,11 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
     # 文本：Hi!
 
     #====================================================================================================
+    
     user_name, avatar_url = await get_user_info(bot, event.group_id, event.user_id);
     DiscordFunc = Discord(user_name, avatar_url);
     resultMessage = ""
+    
     #====================================================================================================
 
     # 回复
@@ -97,6 +99,8 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
     user_name, avatar_url = await get_user_info(bot, event.group_id, event.user_id)
     DiscordFunc = Discord(user_name, avatar_url)
     
+    # 需要使用NapNeko的get_file接口
+    # 其他适配器暂时不知道
     file_info = await bot.get_group_file_url(group_id=event.group_id, file_id=event.file.id, busid=event.file.busid)
     file_url = file_info['url']
 
