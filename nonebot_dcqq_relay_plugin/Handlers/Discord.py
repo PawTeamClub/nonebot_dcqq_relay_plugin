@@ -86,6 +86,7 @@ async def handle_qq_message(bot: OneBotBot, event: OneBotGroupMessageEvent):
         await QQModule.Update(str(event.message_id), res.id, "content")
 
 # 上传群文件事件
+# @todo: 数据库需要重新整理，因为此事件只会返回file_id，但撤回需要message_id
 @noticeEvent.handle()
 async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEvent):
     # 确保事件类型是群文件上传
