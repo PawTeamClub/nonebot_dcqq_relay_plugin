@@ -3,7 +3,7 @@ from tortoise.fields.data import JSONField, DatetimeField, IntField, CharField
 
 class OnebotMessageIndex(Model):
     id = IntField(pk=True)
-    onebot_message_id = CharField(max_length=64, index=True)
+    onebot_message_id = CharField(max_length=512, index=True)
     message_mapping_id = IntField()
 
     class Meta:
@@ -11,7 +11,7 @@ class OnebotMessageIndex(Model):
 
 class DiscordMessageIndex(Model):
     id = IntField(pk=True)
-    discord_message_id = CharField(max_length=64, index=True)
+    discord_message_id = CharField(max_length=512, index=True)
     message_mapping_id = IntField()
 
     class Meta:
@@ -19,8 +19,8 @@ class DiscordMessageIndex(Model):
 
 class MessageMapping(Model):
     id = IntField(pk=True)
-    onebot_message_id = CharField(max_length=64, null=True, index=True)
-    discord_message_id = CharField(max_length=64, null=True, index=True)
+    onebot_message_id = CharField(max_length=512, null=True, index=True)
+    discord_message_id = CharField(max_length=512, null=True, index=True)
     onebot_message_ids = JSONField(null=True)
     discord_message_ids = JSONField(null=True)
     created_at = DatetimeField(auto_now_add=True)

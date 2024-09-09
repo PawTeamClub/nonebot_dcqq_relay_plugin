@@ -98,9 +98,9 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
         return;
 
     #====================================================================================================
-
+    #delete_group_file
     # 初始化数据
-    await QQModule.Create(str(event.message_id));
+    await QQModule.Create(str(event.file.id));
     user_name, avatar_url = await get_user_info(bot, event.group_id, event.user_id)
     DiscordFunc = Discord(user_name, avatar_url)
     
@@ -127,32 +127,33 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
                     f"但是下载文件失败，请联系管理员重新下载文件，HTTP 状态码：{FileStateCode}"
                 )
                 res = await DiscordFunc.send(error_message)
-                await QQModule.Update(str(event.message_id), res.id, "file")
+                await QQModule.Update(str(event.file.id), res.id, "info")
                 return;
 
             # File类格式化
             file = File(filename=event.file.name, content=FileBytes)
-            res = await DiscordFunc.sendFile(user_name, avatar_url, file);
-            await QQModule.Update(str(event.message_id), res.id, "file")
+            res = await DiscordFunc.sendFile(file);
+            await QQModule.Update(str(event.file.id), res.id, "file")
 
         # napneko -> get_file
         elif bot_manager.adapter_type == "napneko":
 
             # 获取文件信息
             file_info = await bot.get_file(file_id=event.file.id)
-
+            file_name = file_info["file_name"]
+            file_path = Path(file_info["file"])
             # 避免干啥了导致的错误
             try:
 
                 # 读取文件数据
-                FileBytes = Path(file_info["file"]).read_bytes()
+                FileBytes = file_path.read_bytes()
 
                 # File类格式化
-                file = File(filename=file_info["file_name"], content=FileBytes)
+                file = File(filename=file_name, content=FileBytes)
 
                 # 发送文件
-                res = await DiscordFunc.sendFile(user_name, avatar_url, file)
-                await QQModule.Update(str(event.message_id), res.id, "file")
+                res = await DiscordFunc.sendFile(file)
+                await QQModule.Update(str(event.file.id), res.id, "file")
 
             except Exception as e:
 
@@ -160,12 +161,12 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
                 error_message = (
                     f"用户 {user_name} 上传了文件：\n"
                     f"但是传输文件失败，请联系管理员重新处理文件\n"
-                    f"file_name: {file_info["file_name"]}\n"
+                    f"file_name: {file_name}\n"
                     f"Error Info：{e}"
                 )
 
                 res = await DiscordFunc.send(error_message)
-                await QQModule.Update(str(event.message_id), res.id, "file")
+                await QQModule.Update(str(event.file.id), res.id, "info")
                 return;
 
         # 我不到啊
