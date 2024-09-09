@@ -11,6 +11,8 @@ from nonebot.adapters.discord.api import Attachment as DiscordAttachment
 
 #=================================================
 
+# 这部分代码急需优化
+
 def _format(pattern: Pattern[str], content: str, callbacks: Union[Callable, None] = None):
     if not pattern or not content:
         return ""

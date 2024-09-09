@@ -6,6 +6,7 @@ from pathlib import Path
 from nonebot.log import logger
 from nonebot_dcqq_relay_plugin.Core.constants import bot_manager
 from nonebot.adapters.discord.api import Snowflake
+from nonebot.adapters.onebot.v11.bot import Bot as OneBotBot
 
 def get_file_extension(url):
     """
@@ -216,3 +217,20 @@ async def lottieToGif(lottieid: Union[Snowflake, int]) -> Optional[bytes]:
     gif_file.unlink()
 
     return gif_bytes
+
+async def determine_adapter_type(bot: OneBotBot, event) -> str:
+    '''
+    @todo:
+    用于判断onebot适配器api类型
+    非常粗糙，我不知道有没有更多奇怪的API，所以只能这样判断了
+    如果有其他的再来适配吧
+    '''
+    try:
+        await bot.get_group_file_url(group_id=event.group_id, file_id=event.file.id, busid=event.file.busid)
+        return "lagrange"
+    except Exception:
+        try:
+            await bot.get_file(file_id=event.file.id)
+            return "napneko"
+        except Exception as e:
+            return f"unknown {e}"

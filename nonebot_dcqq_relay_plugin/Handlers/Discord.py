@@ -1,12 +1,15 @@
+from pathlib import Path
+
 from nonebot.log import logger
 
 from nonebot_dcqq_relay_plugin.config import plugin_config
 from nonebot_dcqq_relay_plugin.Database import DB, QQModule
 from nonebot_dcqq_relay_plugin.Core.constants import messageEvent, bot_manager, noticeEvent
+from nonebot_dcqq_relay_plugin.Core.global_functions import determine_adapter_type
 from nonebot_dcqq_relay_plugin.Adapters.Discord import Discord, get_user_info, extract_cq
 from nonebot_dcqq_relay_plugin.Core.global_functions import getFile
 
-from nonebot.adapters.discord.api import File, MessageGet
+from nonebot.adapters.discord.api import File
 from nonebot.adapters.onebot.v11 import (
     Bot as OneBotBot,
     GroupMessageEvent as OneBotGroupMessageEvent,
@@ -88,6 +91,7 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
     # 确保事件类型是群文件上传
     if not bot_manager.DiscordBotObj or not isinstance(event, OneBotGroupUploadNoticeEvent) or event.group_id != plugin_config.onebot_channel:
         return;
+
     # 防止机器人自己转发自己的消息
     login_info = await bot.get_login_info()
     if event.user_id == login_info["user_id"]:
@@ -95,31 +99,86 @@ async def handle_group_upload(bot: OneBotBot, event: OneBotGroupUploadNoticeEven
 
     #====================================================================================================
 
+    # 初始化数据
     await QQModule.Create(str(event.message_id));
     user_name, avatar_url = await get_user_info(bot, event.group_id, event.user_id)
     DiscordFunc = Discord(user_name, avatar_url)
     
-    # 需要使用NapNeko的get_file接口
-    # 其他适配器暂时不知道
-    file_info = await bot.get_group_file_url(group_id=event.group_id, file_id=event.file.id, busid=event.file.busid)
-    file_url = file_info['url']
-
     #====================================================================================================
 
-    FileBytes, FileStateCode = await getFile(file_url)
-    if (FileBytes == None):
-        error_message = (
-            f"用户 {user_name} 上传了文件：\n"
-            f"但是下载文件失败，请联系管理员重新下载文件，HTTP 状态码：{FileStateCode}"
-        )
-        res = await DiscordFunc.send(error_message)
-        await QQModule.Update(str(event.message_id), res.id, "file")
-        return;
+    # 获取onebot适配器类型
+    if bot_manager.adapter_type == None:
+        bot_manager.adapter_type = await determine_adapter_type(bot, event);
+    
+    # 获取文件信息
+    try:
+        # lagrange -> get_group_file_url
+        if bot_manager.adapter_type == "lagrange":
 
-    # File类格式化
-    file = File(filename=event.file.name, content=FileBytes)
-    res = await DiscordFunc.sendFile(user_name, avatar_url, file);
-    await QQModule.Update(str(event.message_id), res.id, "file")
+            # 获取文件信息
+            file_info = await bot.get_group_file_url(group_id=event.group_id, file_id=event.file.id, busid=event.file.busid)
+            file_url = file_info['url']
+
+            # 下载文件
+            FileBytes, FileStateCode = await getFile(file_url)
+            if (FileBytes == None):
+                error_message = (
+                    f"用户 {user_name} 上传了文件：\n"
+                    f"但是下载文件失败，请联系管理员重新下载文件，HTTP 状态码：{FileStateCode}"
+                )
+                res = await DiscordFunc.send(error_message)
+                await QQModule.Update(str(event.message_id), res.id, "file")
+                return;
+
+            # File类格式化
+            file = File(filename=event.file.name, content=FileBytes)
+            res = await DiscordFunc.sendFile(user_name, avatar_url, file);
+            await QQModule.Update(str(event.message_id), res.id, "file")
+
+        # napneko -> get_file
+        elif bot_manager.adapter_type == "napneko":
+
+            # 获取文件信息
+            file_info = await bot.get_file(file_id=event.file.id)
+
+            # 避免干啥了导致的错误
+            try:
+
+                # 读取文件数据
+                FileBytes = Path(file_info["file"]).read_bytes()
+
+                # File类格式化
+                file = File(filename=file_info["file_name"], content=FileBytes)
+
+                # 发送文件
+                res = await DiscordFunc.sendFile(user_name, avatar_url, file)
+                await QQModule.Update(str(event.message_id), res.id, "file")
+
+            except Exception as e:
+
+                # 多半是读取文件数据问题，先写个提示吧
+                error_message = (
+                    f"用户 {user_name} 上传了文件：\n"
+                    f"但是传输文件失败，请联系管理员重新处理文件\n"
+                    f"file_name: {file_info["file_name"]}\n"
+                    f"Error Info：{e}"
+                )
+
+                res = await DiscordFunc.send(error_message)
+                await QQModule.Update(str(event.message_id), res.id, "file")
+                return;
+
+        # 我不到啊
+        else:
+            logger.warning(f"Unsupported adapter type: {bot_manager.adapter_type}")
+            return
+        
+    except Exception as e:
+        logger.error(f"Error getting file info: {e}")
+        return
+    
+    #====================================================================================================
+
 
 # 撤回事件
 @noticeEvent.handle()

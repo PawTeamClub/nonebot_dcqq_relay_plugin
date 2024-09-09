@@ -13,6 +13,7 @@ class BotManager:
     DiscordBotObj: DiscordBot = None;
     webhook_id = None;
     webhook = None;
+    adapter_type = None;
     TEMP_PATH: Path = None;
     DOWNLOAD_PATH: Path = None;
     DATABASE_PATH: Path = None;
