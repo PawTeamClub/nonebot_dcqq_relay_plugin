@@ -28,6 +28,13 @@ _✨ 使用Nonebot2让Discord和QQ群实现互相通信 ✨_
 
 正在慢速开发中...
 
+# TODO
+
+- 完善队列系统
+- onebot 与 discord 的驱动器完善
+- 尝试减少 HTTP 获取字节码 (找方法使用NTQQ的缓存进行加载字节)
+- 不使用系统代理也能使用
+
 # 感谢
 
 - [nonebot/nonebot2](https://github.com/nonebot/nonebot2): 跨平台 Python 异步聊天机器人框架
