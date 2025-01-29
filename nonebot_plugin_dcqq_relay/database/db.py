@@ -1,16 +1,16 @@
 import json
-from typing import List, Any, Optional
-from .models import MessageMapping, OnebotMessageIndex, DiscordMessageIndex
-from pathlib import Path
-from tortoise import Tortoise
-from nonebot.log import logger
-from tortoise.connection import connections
-from tortoise.expressions import RawSQL
+from typing                     import List, Any, Optional
+from typing_extensions import Union
+from .models                    import MessageMapping, OnebotMessageIndex, DiscordMessageIndex
+from pathlib                    import Path
+from tortoise                   import Tortoise
+from nonebot.log                import logger
+from tortoise.connection        import connections
+from tortoise.expressions       import Q,RawSQL
 
 #====================================================================
 
 # Discord数据库
-
 class DiscordModule():
     @classmethod
     async def Create(cls, discord_message_id: str):
@@ -30,7 +30,7 @@ class DiscordModule():
     async def GetTables(cls, discord_message_id: str) -> List[Any]:
         """在Discord表获取QQ消息表"""
         mapping = await MessageMapping.get_or_none(discord_message_id=discord_message_id)
-        return mapping.onebot_message_ids if mapping else []
+        return [mapping.onebot_message_ids] if mapping else []
     @classmethod
     async def GetIDs(cls, discord_message_id: str) -> List[Any]:
         """获取Discord表的QQ消息ID"""
@@ -42,14 +42,13 @@ class DiscordModule():
 
 #====================================================================
 
-# QQ数据库
-
-class QQModule():
+# Onebot数据库
+class OneBotModule():
     @classmethod
-    async def Create(cls, onebot_message_id: str):
+    async def Create(cls, onebot_message_id: Union[str, int]):
         """创建QQ消息表"""
         return await MessageMapping.create(
-            onebot_message_id=onebot_message_id,
+            onebot_message_id=str(onebot_message_id),
             discord_message_ids=json.dumps([]),
             onebot_message_ids=json.dumps([])
         )
@@ -60,10 +59,10 @@ class QQModule():
         mapping.discord_message_ids.append({"id": discord_message_id, "type": discord_message_type})
         await mapping.save()
     @classmethod
-    async def GetTables(cls, onebot_message_id: str) -> List[Any]:
+    async def GetTables(cls, onebot_message_id: Union[str, int]) -> List[Any]:
         """在QQ消息表获取Discord消息ID列表"""
-        mapping = await MessageMapping.get_or_none(onebot_message_id=onebot_message_id)
-        return mapping.discord_message_ids if mapping else []
+        mapping = await MessageMapping.get_or_none(onebot_message_id=str(onebot_message_id))
+        return [mapping.discord_message_ids] if mapping else []
     @classmethod
     async def GetIDs(cls, onebot_message_id: str) -> List[Any]:
         """获取QQ消息表的QQ消息ID"""
@@ -87,21 +86,18 @@ class QQModule():
 #====================================================================
 
 # 主数据库方法
-
-class DB():
-
+class Database():
     @classmethod
     async def init(cls, database_path: Path):
         """初始化数据库"""
         config = {
             "connections": {
-                "nonebot_dcqq_relay_db": f"sqlite://{database_path.joinpath('data.sqlite3')}"
+                "nonebot_db_dcqq_relay": f"sqlite://{database_path.joinpath('data.sqlite3')}"
             },
             "apps": {
-                "nonebot_dcqq_relay": {
-                    #"models": ["nonebot_dcqq_relay_plugin.Database.models"],
-                    "models": ["nonebot_dcqq_relay_plugin.Database.models"],
-                    "default_connection": "nonebot_dcqq_relay_db",
+                "nonebot_plugin_dcqq_relay": {
+                    "models": ["nonebot_plugin_dcqq_relay.database.models"],
+                    "default_connection": "nonebot_db_dcqq_relay",
                 }
             },
         }
@@ -113,8 +109,6 @@ class DB():
         """关闭数据库"""
         await connections.close_all();
 
-    #======================================================================
-
     @staticmethod
     async def find_by_onebot_message_id(onebot_message_id: str):
         # 首先查找索引表
@@ -123,16 +117,17 @@ class DB():
             return await MessageMapping.get(id=index.message_mapping_id)
 
         return None;
-    
+
     @staticmethod
     async def find_by_onebot_message_ids(onebot_message_id: str, page: int = 1, page_size: int = 100):
         offset = (page - 1) * page_size
         query = MessageMapping.filter(
-            RawSQL("json_extract(onebot_message_ids, '$[*].id') LIKE ?", [f'%{onebot_message_id}%'])
+            Q(onebot_message_ids__contains=onebot_message_id)
+            #RawSQL("json_extract(onebot_message_ids, '$[*].id') LIKE ?", [f'%{onebot_message_id}%'])
         )
         total = await query.count()
         results = await query.offset(offset).limit(page_size)
-        
+
         return {
             'total': total,
             'page': page,
@@ -144,21 +139,22 @@ class DB():
     async def find_by_discord_message_id(discord_message_id: str):
         # 首先查找索引表
         index = await DiscordMessageIndex.filter(discord_message_id=discord_message_id).first()
-        
+
         if index:
             return await MessageMapping.get(id=index.message_mapping_id)
 
         return None;
-    
+
     @staticmethod
     async def find_by_discord_message_ids(discord_message_id: str, page: int = 1, page_size: int = 100):
         offset = (page - 1) * page_size
         query = MessageMapping.filter(
-            RawSQL("json_extract(discord_message_ids, '$[*].id') LIKE ?", [f'%{discord_message_id}%'])
+            Q(discord_message_ids__contains=discord_message_id)
+            #RawSQL("json_extract(discord_message_ids, '$[*].id') LIKE ?", [f'%{discord_message_id}%'])
         )
         total = await query.count()
         results = await query.offset(offset).limit(page_size)
-        
+
         return {
             'total': total,
             'page': page,
